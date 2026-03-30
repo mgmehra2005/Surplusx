@@ -12,7 +12,7 @@ async function loadDonors() {
     donorListElement.innerHTML = '';
 
     try {
-        const response = await fetch('http://localhost:5000/api/food/donor-list');
+        const response = await fetch('/api/food/donor-list');
         if (!response.ok) {
             throw new Error(`Request failed with status ${response.status}`);
         }
@@ -34,7 +34,7 @@ async function loadDonors() {
             if (typeof donor === 'string') {
                 item.textContent = donor;
             } else {
-                const donorName = donor.name || donor.username || donor.email || 'Unnamed donor';
+                const donorName = donor.name || donor.username || 'Unnamed donor';
                 const donorLocation = donor.location ? ` - ${donor.location}` : '';
                 item.textContent = `${donorName}${donorLocation}`;
             }
@@ -56,6 +56,6 @@ refreshDonorsButton.addEventListener('click', loadDonors);
 profileButton.addEventListener('click', () => showFeatureUnavailable('Profile'));
 loginButton.addEventListener('click', () => showFeatureUnavailable('Login'));
 logoutButton.addEventListener('click', () => showFeatureUnavailable('Logout'));
-historyButton.addEventListener('click', () => showFeatureUnavailable('Donor history'));
+historyButton.addEventListener('click', () => showFeatureUnavailable('Donor History'));
 
 loadDonors();
