@@ -43,7 +43,11 @@ async function loadDonors() {
 
         donorListStatusElement.textContent = `Loaded ${donors.length} donor(s).`;
     } catch (error) {
-        donorListStatusElement.textContent = 'Failed to load donors list.';
+        if (error && typeof error.message === 'string' && error.message.includes('status 5')) {
+            donorListStatusElement.textContent = 'Server error occurred while loading donors.';
+        } else {
+            donorListStatusElement.textContent = 'Unable to connect to donor list service.';
+        }
     }
 }
 
