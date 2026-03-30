@@ -36,8 +36,8 @@ function AdminPanel() {
       <section className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-semibold text-slate-900">System Logs</h2>
         <ul className="mt-3 list-inside list-disc space-y-2 text-sm text-slate-700">
-          {overview.logs.map((log) => (
-            <li key={log}>{log}</li>
+          {overview.logs.map((log, index) => (
+            <li key={`log-${index}`}>{log}</li>
           ))}
         </ul>
       </section>
