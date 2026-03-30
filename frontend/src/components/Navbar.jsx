@@ -1,65 +1,63 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
 
-function navClassName({ isActive }) {
-  return `rounded-md px-3 py-2 text-sm font-medium transition ${
-    isActive ? 'bg-emerald-100 text-emerald-800' : 'text-slate-700 hover:bg-slate-100'
-  }`
-}
-
 function Navbar() {
-  const { user, isAuthenticated, logout } = useAuth()
-  const navigate = useNavigate()
+  const { isAuthenticated, user } = useAuth()
 
-  const onLogout = () => {
-    logout()
-    navigate('/')
-  }
+  const navLinks = [
+    { name: 'Home', path: '/#home' },
+    { name: 'Features', path: '/#features' },
+    { name: 'How It Works', path: '/#how-it-works' },
+    { name: 'Impact', path: '/#impact' },
+  ]
 
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
-      <nav className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <Link className="text-xl font-bold text-emerald-700" to="/">
-          SurplusX
-        </Link>
+    <header className="sticky top-0 z-50 w-full bg-white/20 px-6 py-5 backdrop-blur-md md:px-16 lg:px-24">
+      <nav className="flex items-center justify-between">
+        {/* Left: Logo */}
+        <div className="flex flex-1">
+          <Link to="/" className="font-instrument text-lg font-medium tracking-tight text-slate-800">
+            SurplusX
+          </Link>
+        </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <NavLink className={navClassName} to="/">
-            Home
-          </NavLink>
-
-          {!isAuthenticated && (
-            <NavLink className={navClassName} to="/auth">
-              Login / Register
-            </NavLink>
-          )}
-
-          {isAuthenticated && user.role === 'donor' && (
-            <NavLink className={navClassName} to="/donor">
-              Donor Dashboard
-            </NavLink>
-          )}
-
-          {isAuthenticated && user.role === 'ngo' && (
-            <NavLink className={navClassName} to="/ngo">
-              NGO Dashboard
-            </NavLink>
-          )}
-
-          {isAuthenticated && user.role === 'admin' && (
-            <NavLink className={navClassName} to="/admin">
-              Admin Panel
-            </NavLink>
-          )}
-
-          {isAuthenticated && (
-            <button
-              className="rounded-md bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
-              onClick={onLogout}
-              type="button"
+        {/* Center: Links */}
+        <div className="hidden flex-initial items-center space-x-10 md:flex">
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.name}
+              to={link.path}
+              className="font-instrument text-[14px] font-medium text-slate-600 transition-colors hover:text-slate-900"
             >
-              Logout
-            </button>
+              {link.name}
+            </NavLink>
+          ))}
+        </div>
+
+        {/* Right: Actions */}
+        <div className="flex flex-1 items-center justify-end space-x-8">
+          {!isAuthenticated ? (
+            <>
+              <Link
+                to="/auth"
+                className="font-instrument rounded-full bg-slate-900 px-8 py-2.5 text-[14px] font-medium text-white transition-all hover:bg-slate-800"
+              >
+                Get Started
+              </Link>
+              <Link
+                to="/auth"
+                className="font-instrument text-[14px] font-medium text-slate-600 transition-colors hover:text-slate-900"
+              >
+                Sign In
+              </Link>
+            </>
+          ) : (
+            <Link
+              to={user.role === 'donor' ? '/donor' : user.role === 'ngo' ? '/ngo' : '/admin'}
+              className="font-instrument rounded-full bg-slate-900 px-8 py-2.5 text-[14px] font-medium text-white transition-all hover:bg-slate-800"
+            >
+              Dashboard
+            </Link>
           )}
         </div>
       </nav>
