@@ -1,40 +1,29 @@
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register page</title>
+    <title>NGO Dashboard</title>
 </head>
-
 <body>
-    <h2>Register</h2>
-    <form id="registration-form">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Register</button>
-    </form>
-    <h5 id="registration-status"></h5>
-    <script>
-        document.getElementById('registration-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            try {
-                const response = await fetch('http://localhost:5000/api/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                document.getElementById('registration-status').textContent = result.message;
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('registration-status').textContent = 'Registration failed. Please try again.';
-            }
-        });
-    </script>
+    <h1>NGO Dashboard</h1>
+
+    <section>
+        <button id="profile-btn" type="button">Profile</button>
+        <button id="login-btn" type="button">Login</button>
+        <button id="logout-btn" type="button">Logout</button>
+        <button id="history-btn" type="button">Donor History</button>
+    </section>
+
+    <p id="feature-status"></p>
+
+    <section>
+        <h2>Donors List</h2>
+        <button id="refresh-donors-btn" type="button">Refresh Donor List</button>
+        <p id="donor-list-status"></p>
+        <ul id="donor-list"></ul>
+    </section>
+
+    <script src="./script.js"></script>
 </body>
 </html>
