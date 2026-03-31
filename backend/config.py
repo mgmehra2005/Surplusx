@@ -12,7 +12,8 @@ class Config:
     DB_NAME = os.environ.get("DB_NAME", "surplusx")
     DEBUG = False
 
-
+    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class DevelopmentConfig(Config):
     DEBUG = True
