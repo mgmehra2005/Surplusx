@@ -15,7 +15,7 @@ function Navbar() {
       <nav className="flex items-center justify-between">
         {/* Left: Logo */}
         <div className="flex flex-1">
-          <Link to="/" className="flex items-center space-x-2 font-instrument text-lg font-medium tracking-tight text-slate-800">
+          <Link to="/" className="flex items-center space-x-2 font-parabolica text-lg font-medium tracking-tight text-slate-800">
             <svg
               className="h-7 w-7 text-emerald-600"
               viewBox="0 0 24 24"
@@ -38,7 +38,7 @@ function Navbar() {
             <NavLink
               key={link.name}
               to={link.path}
-              className="font-instrument text-[15px] font-medium text-slate-600 transition-colors hover:text-emerald-600"
+              className="font-parabolica text-[15px] font-medium text-slate-600 transition-colors hover:text-emerald-600"
             >
               {link.name}
             </NavLink>
@@ -51,13 +51,13 @@ function Navbar() {
             <>
               <Link
                 to="/auth?mode=login"
-                className="font-instrument rounded-full bg-emerald-600 px-8 py-2.5 text-[15px] font-medium text-white transition-all hover:bg-emerald-700"
+                className="font-parabolica rounded-full bg-emerald-600 px-8 py-2.5 text-[15px] font-medium text-white transition-all hover:bg-emerald-700"
               >
                 Login
               </Link>
               <Link
                 to="/auth?mode=register"
-                className="font-instrument text-[15px] font-medium text-slate-600 transition-colors hover:text-emerald-600"
+                className="font-parabolica text-[15px] font-medium text-slate-600 transition-colors hover:text-emerald-600"
               >
                 Sign Up
               </Link>
@@ -65,7 +65,7 @@ function Navbar() {
           ) : (
             <Link
               to={user.role === 'donor' ? '/donor' : user.role === 'ngo' ? '/ngo' : '/admin'}
-              className="font-instrument rounded-full bg-emerald-600 px-8 py-2.5 text-[14px] font-medium text-white transition-all hover:bg-emerald-700"
+              className="font-parabolica rounded-full bg-emerald-600 px-8 py-2.5 text-[14px] font-medium text-white transition-all hover:bg-emerald-700"
             >
               Dashboard
             </Link>

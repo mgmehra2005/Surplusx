@@ -4,6 +4,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        parabolica: ['parabolica', 'sans-serif'],
         instrument: ['"Instrument Serif"', 'serif'],
       },
     },
