@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -23,6 +23,15 @@ function AuthPage() {
   const [errors, setErrors] = useState({})
   const { login, register } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const modeParam = params.get('mode')
+    if (modeParam === 'login' || modeParam === 'register') {
+      setMode(modeParam)
+    }
+  }, [location.search])
 
   const onInputChange = (event) => {
     const { name, value } = event.target

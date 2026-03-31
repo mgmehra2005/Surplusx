@@ -6,7 +6,6 @@ function Navbar() {
 
   const navLinks = [
     { name: 'Home', path: '/#home' },
-    { name: 'Features', path: '/#features' },
     { name: 'How It Works', path: '/#how-it-works' },
     { name: 'Impact', path: '/#impact' },
   ]
@@ -16,8 +15,20 @@ function Navbar() {
       <nav className="flex items-center justify-between">
         {/* Left: Logo */}
         <div className="flex flex-1">
-          <Link to="/" className="font-instrument text-lg font-medium tracking-tight text-slate-800">
-            SurplusX
+          <Link to="/" className="flex items-center space-x-2 font-instrument text-lg font-medium tracking-tight text-slate-800">
+            <svg
+              className="h-7 w-7 text-emerald-600"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M18 6L6 18M6 6l12 12" />
+              <circle cx="12" cy="12" r="3" fill="currentColor" fillOpacity="0.2" />
+            </svg>
+            <span>SurplusX</span>
           </Link>
         </div>
 
@@ -27,7 +38,7 @@ function Navbar() {
             <NavLink
               key={link.name}
               to={link.path}
-              className="font-instrument text-[14px] font-medium text-slate-600 transition-colors hover:text-slate-900"
+              className="font-instrument text-[15px] font-medium text-slate-600 transition-colors hover:text-emerald-600"
             >
               {link.name}
             </NavLink>
@@ -39,22 +50,22 @@ function Navbar() {
           {!isAuthenticated ? (
             <>
               <Link
-                to="/auth"
-                className="font-instrument rounded-full bg-slate-900 px-8 py-2.5 text-[14px] font-medium text-white transition-all hover:bg-slate-800"
+                to="/auth?mode=login"
+                className="font-instrument rounded-full bg-emerald-600 px-8 py-2.5 text-[15px] font-medium text-white transition-all hover:bg-emerald-700"
               >
-                Get Started
+                Login
               </Link>
               <Link
-                to="/auth"
-                className="font-instrument text-[14px] font-medium text-slate-600 transition-colors hover:text-slate-900"
+                to="/auth?mode=register"
+                className="font-instrument text-[15px] font-medium text-slate-600 transition-colors hover:text-emerald-600"
               >
-                Sign In
+                Sign Up
               </Link>
             </>
           ) : (
             <Link
               to={user.role === 'donor' ? '/donor' : user.role === 'ngo' ? '/ngo' : '/admin'}
-              className="font-instrument rounded-full bg-slate-900 px-8 py-2.5 text-[14px] font-medium text-white transition-all hover:bg-slate-800"
+              className="font-instrument rounded-full bg-emerald-600 px-8 py-2.5 text-[14px] font-medium text-white transition-all hover:bg-emerald-700"
             >
               Dashboard
             </Link>
