@@ -87,7 +87,7 @@ function LandingPage() {
             <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row md:items-start">
               <Link
                 to="/auth"
-                className="font-instrument rounded-full bg-slate-900 px-10 py-2 text-[15px] font-medium text-white transition-all hover:bg-slate-800"
+                className="font-instrument rounded-full bg-emerald-600 px-10 py-2 text-[15px] font-medium text-white transition-all hover:bg-emerald-700"
               >
                 Join the Network
               </Link>
@@ -129,8 +129,8 @@ function LandingPage() {
               <button
                 onClick={() => setActiveRole('donors')}
                 className={`font-instrument rounded-full px-6 py-1.5 text-[13px] transition-all ${activeRole === 'donors'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'text-slate-500 hover:text-emerald-600'
                   }`}
               >
                 For Donors
@@ -138,8 +138,8 @@ function LandingPage() {
               <button
                 onClick={() => setActiveRole('ngos')}
                 className={`font-instrument rounded-full px-6 py-1.5 text-[13px] transition-all ${activeRole === 'ngos'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'text-slate-500 hover:text-emerald-600'
                   }`}
               >
                 For NGOs
@@ -179,7 +179,7 @@ function LandingPage() {
                   key={idx}
                   className="group rounded-[1.5rem] border border-slate-200 bg-white p-6 transition-all duration-300 hover:border-slate-400"
                 >
-                  <div className="mb-3 flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-[10px] font-medium text-white ring-4 ring-slate-50">
+                  <div className="mb-3 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-medium text-white ring-4 ring-emerald-50">
                     {idx + 1}
                   </div>
                   <h3 className="font-instrument mb-2 text-xl tracking-tight text-slate-900">
@@ -211,7 +211,7 @@ function LandingPage() {
           <div className="flex flex-col items-center justify-center gap-8 md:flex-row md:gap-12">
             {/* Meals Card */}
             <div className="group relative w-full min-h-[220px] max-w-[300px] transform rounded-[2rem] border border-slate-100 bg-slate-50 p-10 text-center transition-all duration-500 hover:scale-105 md:-rotate-2">
-              <span className="font-instrument block text-5xl tracking-tight text-slate-900 md:text-6xl">
+              <span className="font-instrument block text-5xl tracking-tight text-emerald-600 md:text-6xl">
                 <CountUp end={1240} suffix="+" />
               </span>
               <div className="mt-6">
@@ -222,7 +222,7 @@ function LandingPage() {
 
             {/* Network Card */}
             <div className="group relative w-full min-h-[220px] max-w-[300px] transform rounded-[2rem] border border-slate-100 bg-slate-50 p-10 text-center transition-all duration-500 hover:scale-105">
-              <span className="font-instrument block text-5xl tracking-tight text-slate-900 md:text-6xl">
+              <span className="font-instrument block text-5xl tracking-tight text-emerald-600 md:text-6xl">
                 <CountUp end={320} suffix="+" />
               </span>
               <div className="mt-6">
@@ -233,7 +233,7 @@ function LandingPage() {
 
             {/* Waste Card */}
             <div className="group relative w-full min-h-[220px] max-w-[300px] transform rounded-[2rem] border border-slate-100 bg-slate-50 p-10 text-center transition-all duration-500 hover:scale-105 md:rotate-2">
-              <span className="font-instrument block text-5xl tracking-tight text-slate-900 md:text-6xl">
+              <span className="font-instrument block text-5xl tracking-tight text-emerald-600 md:text-6xl">
                 <CountUp end={3.8} decimals={1} suffix=" Tons" />
               </span>
               <div className="mt-6">
