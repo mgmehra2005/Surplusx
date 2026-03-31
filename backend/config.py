@@ -6,10 +6,10 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
 
     # Database settings (read from environment if present)
-    DB_HOST = os.environ.get("DB_HOST", "localhost")
-    DB_USER = os.environ.get("DB_USER", "root")
-    DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
-    DB_NAME = os.environ.get("DB_NAME", "surplusx")
+    DB_HOST = os.environ.get("MYSQL_HOST", "localhost")
+    DB_USER = os.environ.get("MYSQL_USER", "root")
+    DB_PASSWORD = os.environ.get("MYSQL_PASSWORD", "")
+    DB_NAME = os.environ.get("MYSQL_DATABASE", "surplusx")
     DEBUG = False
 
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
