@@ -29,8 +29,8 @@ const Footer = () => {
             <div className="space-y-4">
               <h4 className="font-instrument text-[14px] font-semibold uppercase tracking-widest text-slate-900">Platform</h4>
               <ul className="space-y-3 font-instrument text-[15px] text-slate-500">
-                <li><Link to="/#how-it-works" className="transition-colors hover:text-emerald-600">How it works</Link></li>
-                <li><Link to="/#impact" className="transition-colors hover:text-emerald-600">Impact</Link></li>
+                <li><button onClick={() => window.dispatchEvent(new CustomEvent('scrollToSection', { detail: 'how-it-works' }))} className="transition-colors hover:text-emerald-600">How it works</button></li>
+                <li><button onClick={() => window.dispatchEvent(new CustomEvent('scrollToSection', { detail: 'impact' }))} className="transition-colors hover:text-emerald-600">Impact</button></li>
               </ul>
             </div>
             <div className="space-y-4">

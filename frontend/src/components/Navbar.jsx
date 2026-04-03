@@ -70,7 +70,7 @@ function Navbar() {
           ) : (
             <Link
               to={user.role === 'donor' ? '/donor' : user.role === 'ngo' ? '/ngo' : '/admin'}
-              className="font-instrument rounded-full bg-emerald-600 px-8 py-2.5 text-[17px] font-medium text-white transition-all hover:bg-emerald-700"
+              className="font-instrument rounded-full bg-emerald-600 px-8 py-2 text-[17px] font-medium text-white transition-all hover:bg-emerald-700"
             >
               Dashboard
             </Link>

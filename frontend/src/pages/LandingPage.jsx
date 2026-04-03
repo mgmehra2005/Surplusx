@@ -108,16 +108,17 @@ function LandingPage() {
             <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row md:items-start">
               <Link
                 to="/auth"
+                state={{ mode: 'register' }}
                 className="font-instrument rounded-full bg-emerald-600 px-10 py-2 text-[15px] font-medium text-white transition-all hover:bg-emerald-700"
               >
                 Join the Network
               </Link>
-              <Link
-                to="/#how-it-works"
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('scrollToSection', { detail: 'how-it-works' }))}
                 className="font-instrument rounded-full border border-slate-200 bg-white px-10 py-2 text-[15px] font-medium text-slate-900 transition-all hover:bg-slate-50"
               >
                 See the Flow
-              </Link>
+              </button>
             </div>
           </div>
 
