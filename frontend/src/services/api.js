@@ -9,6 +9,11 @@ export async function loginUser({ username, password }) {
   return data
 }
 
+export async function registerUser(userData) {
+  const { data } = await apiClient.post('/auth/register', userData)
+  return data
+}
+
 /*
   TODO: Connect to Flask API: http://localhost:5000/api/....
   This service intentionally returns mock data right now.

@@ -1,5 +1,5 @@
 import { createContext, useState } from 'react'
-import { loginUser } from '../services/api.js'
+import { loginUser, registerUser } from '../services/api.js'
 
 const AuthContext = createContext(null)
 
@@ -46,9 +46,15 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const register = ({ username, email }) => {
-    const role = resolveRole(email)
-    saveUser({ username, email, role })
+  const register = async (userData) => {
+    try {
+      const data = await registerUser(userData)
+      saveUser(data)
+      return data
+    } catch (error) {
+      console.error('Registration Error:', error)
+      throw error
+    }
   }
 
   const logout = () => {

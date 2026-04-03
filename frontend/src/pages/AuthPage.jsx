@@ -116,18 +116,19 @@ function AuthPage() {
       } else {
         const authPayload = {
           username: formData.username.trim(),
-          email: formData.email.trim(),
-          password: formData.password,
           firstName: formData.firstName.trim(),
           lastName: formData.lastName.trim(),
-          phone: `${formData.countryCode} ${formData.phone.trim()}`,
-          role: formData.role,
+          password: formData.password,
+          email: formData.email.trim(),
+          phone: `${formData.countryCode}${formData.phone.trim()}`,
+          role: formData.role.toUpperCase(),
         }
 
-        register(authPayload)
+        const userData = await register(authPayload)
 
-        const finalRole = authPayload.role
-        navigate(getRouteByRole(finalRole))
+        // On success, navigate to the specific dashboard
+        const role = userData?.role || 'donor'
+        navigate(getRouteByRole(role))
       }
     } catch (error) {
       const message = error.response?.data?.message || 'Authentication failed. Please check your credentials.'
