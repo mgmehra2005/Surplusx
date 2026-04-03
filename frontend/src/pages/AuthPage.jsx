@@ -5,6 +5,7 @@ import { loginUser, registerUser } from '../services/api.js'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/
+const phoneRegex = /^\d{10}$/
 
 function getRouteByRole(role) {
   if (role === 'NGO') {
@@ -20,7 +21,17 @@ function getRouteByRole(role) {
 
 function AuthPage() {
   const [mode, setMode] = useState('login')
-  const [formData, setFormData] = useState({ username: '', email: '', password: '' })
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    countryCode: '+91',
+    role: '',
+    confirmPassword: ''
+  })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const { login, register } = useAuth()
@@ -28,12 +39,10 @@ function AuthPage() {
   const location = useLocation()
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    const modeParam = params.get('mode')
-    if (modeParam === 'login' || modeParam === 'register') {
-      setMode(modeParam)
+    if (location.state?.mode) {
+      setMode(location.state.mode)
     }
-  }, [location.search])
+  }, [location.state])
 
   const onInputChange = (event) => {
     const { name, value } = event.target
@@ -57,8 +66,29 @@ function AuthPage() {
       nextErrors.email = 'Please enter a valid email address.'
     }
 
-    if (!passwordRegex.test(formData.password)) {
-      nextErrors.password = 'Password must be 8+ chars with upper, lower, number, and symbol.'
+    if (mode === 'register') {
+      if (!passwordRegex.test(formData.password)) {
+        nextErrors.password = 'Must be 8+ chars (upper, lower, num, symbol).'
+      }
+      if (!formData.firstName.trim()) {
+        nextErrors.firstName = 'First name is required.'
+      }
+      if (!formData.lastName.trim()) {
+        nextErrors.lastName = 'Last name is required.'
+      }
+      if (!formData.countryCode.trim()) {
+        nextErrors.phone = 'Country code and number are required.'
+      } else if (!phoneRegex.test(formData.phone.trim())) {
+        nextErrors.phone = 'Please enter exactly 10 digits.'
+      }
+      if (!formData.role) {
+        nextErrors.role = 'Please select your role.'
+      }
+      if (!formData.confirmPassword) {
+        nextErrors.confirmPassword = 'Please confirm your password.'
+      } else if (formData.password !== formData.confirmPassword) {
+        nextErrors.confirmPassword = 'Passwords do not match.'
+      }
     }
 
     setErrors(nextErrors)
@@ -125,7 +155,7 @@ function AuthPage() {
             : 'Login with your credentials'}
         </p>
 
-        <div className="mt-4 grid grid-cols-2 rounded-lg bg-slate-100 p-1">
+        <div className="mt-8 flex space-x-1 rounded-full border border-slate-100 bg-slate-50 p-1">
           <button
             className={`rounded-md px-3 py-2 text-sm font-medium ${
               mode === 'login' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'
@@ -158,19 +188,20 @@ function AuthPage() {
           {errors.submit && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{errors.submit}</div>}
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="username">
-              Username
+            <label className="font-instrument mb-1.5 block text-sm font-medium text-slate-700" htmlFor="username">
+              Username <span className="text-red-500">*</span>
             </label>
             <input
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-emerald-500 focus:ring"
+              className="font-instrument w-full rounded-xl border border-slate-200 px-4 py-2.5 text-[15px] outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 placeholder:text-slate-400"
               id="username"
               name="username"
+              placeholder="e.g. rahul123"
               onChange={onInputChange}
               type="text"
               value={formData.username}
               disabled={loading}
             />
-            {errors.username && <p className="mt-1 text-xs text-red-600">{errors.username}</p>}
+            {errors.username && <p className="mt-1.5 font-instrument text-xs text-red-500">{errors.username}</p>}
           </div>
 
           <div>

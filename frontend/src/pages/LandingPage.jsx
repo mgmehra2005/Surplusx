@@ -5,6 +5,7 @@ import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 import heroImg from '../../assets/hero_img.png'
 import donorImg from '../../assets/donor_img.png'
 import ngoImg from '../../assets/ngo_img.png'
+import Footer from '../components/Footer.jsx'
 
 gsap.registerPlugin(ScrollToPlugin)
 
@@ -41,16 +42,36 @@ function LandingPage() {
   const [activeRole, setActiveRole] = useState('donors') // 'donors' or 'ngos'
   const { hash } = useLocation()
 
+  const location = useLocation()
+
   useEffect(() => {
-    if (hash) {
-      const target = hash.startsWith('#') ? hash : `#${hash}`
+    const scrollToId = (id) => {
+      const isHome = id === 'home' || id === 'top'
       gsap.to(window, {
         duration: 1.2,
-        scrollTo: { y: target, autoKill: false, offsetY: 100 },
-        ease: 'power3.inOut',
+        scrollTo: { 
+          y: isHome ? 0 : `#${id}`, 
+          autoKill: false, 
+          offsetY: isHome ? 0 : 100 
+        },
+        ease: 'power4.inOut',
+        overwrite: 'all',
       })
     }
-  }, [hash])
+
+    // 1. Handle navigation from of state (cross-page)
+    if (location.state?.scrollTo) {
+      scrollToId(location.state.scrollTo)
+      // Clear state to avoid scrolling again on back nav
+      window.history.replaceState({}, document.title)
+    }
+
+    // 2. Handle same-page internal clicking
+    const handleEvent = (e) => scrollToId(e.detail)
+    window.addEventListener('scrollToSection', handleEvent)
+
+    return () => window.removeEventListener('scrollToSection', handleEvent)
+  }, [location])
 
   const content = {
     donors: {
@@ -87,16 +108,17 @@ function LandingPage() {
             <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row md:items-start">
               <Link
                 to="/auth"
+                state={{ mode: 'register' }}
                 className="font-instrument rounded-full bg-emerald-600 px-10 py-2 text-[15px] font-medium text-white transition-all hover:bg-emerald-700"
               >
                 Join the Network
               </Link>
-              <Link
-                to="/#how-it-works"
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('scrollToSection', { detail: 'how-it-works' }))}
                 className="font-instrument rounded-full border border-slate-200 bg-white px-10 py-2 text-[15px] font-medium text-slate-900 transition-all hover:bg-slate-50"
               >
                 See the Flow
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -114,7 +136,7 @@ function LandingPage() {
       </main>
 
       {/* How it Works Section */}
-      <section id="how-it-works" className="px-6 py-16 md:px-16 lg:px-24">
+      <section id="how-it-works" className="mt-12 px-6 py-16 md:px-16 lg:px-24">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 flex flex-col items-center text-center">
             <h2 className="font-instrument text-3xl tracking-tight text-slate-900 md:text-4xl">
@@ -210,40 +232,41 @@ function LandingPage() {
           {/* Impact Cards Grid */}
           <div className="flex flex-col items-center justify-center gap-8 md:flex-row md:gap-12">
             {/* Meals Card */}
-            <div className="group relative w-full min-h-[220px] max-w-[300px] transform rounded-[2rem] border border-slate-100 bg-slate-50 p-10 text-center transition-all duration-500 hover:scale-105 md:-rotate-2">
+            <div className="group relative w-full min-h-[240px] max-w-[320px] rounded-[2.5rem] border-2 border-slate-100 bg-white p-10 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-600/20 hover:shadow-lg hover:shadow-emerald-600/5">
               <span className="font-instrument block text-5xl tracking-tight text-emerald-600 md:text-6xl">
                 <CountUp end={1240} suffix="+" />
               </span>
               <div className="mt-6">
-                <p className="font-medium text-slate-900">Meals</p>
-                <p className="text-sm text-slate-500">Redistributed</p>
+                <p className="font-instrument text-xl font-medium text-slate-900">Meals</p>
+                <p className="font-instrument text-[15px] text-slate-500">Redistributed</p>
               </div>
             </div>
 
             {/* Network Card */}
-            <div className="group relative w-full min-h-[220px] max-w-[300px] transform rounded-[2rem] border border-slate-100 bg-slate-50 p-10 text-center transition-all duration-500 hover:scale-105">
+            <div className="group relative w-full min-h-[240px] max-w-[320px] rounded-[2.5rem] border-2 border-slate-100 bg-white p-10 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-600/20 hover:shadow-lg hover:shadow-emerald-600/5">
               <span className="font-instrument block text-5xl tracking-tight text-emerald-600 md:text-6xl">
                 <CountUp end={320} suffix="+" />
               </span>
               <div className="mt-6">
-                <p className="font-medium text-slate-900">Active</p>
-                <p className="text-sm text-slate-500">Network</p>
+                <p className="font-instrument text-xl font-medium text-slate-900">Active</p>
+                <p className="font-instrument text-[15px] text-slate-500">Network</p>
               </div>
             </div>
 
             {/* Waste Card */}
-            <div className="group relative w-full min-h-[220px] max-w-[300px] transform rounded-[2rem] border border-slate-100 bg-slate-50 p-10 text-center transition-all duration-500 hover:scale-105 md:rotate-2">
+            <div className="group relative w-full min-h-[240px] max-w-[320px] rounded-[2.5rem] border-2 border-slate-100 bg-white p-10 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-600/20 hover:shadow-lg hover:shadow-emerald-600/5">
               <span className="font-instrument block text-5xl tracking-tight text-emerald-600 md:text-6xl">
                 <CountUp end={3.8} decimals={1} suffix=" Tons" />
               </span>
               <div className="mt-6">
-                <p className="font-medium text-slate-900">Waste</p>
-                <p className="text-sm text-slate-500">Prevented</p>
+                <p className="font-instrument text-xl font-medium text-slate-900">Waste</p>
+                <p className="font-instrument text-[15px] text-slate-500">Prevented</p>
               </div>
             </div>
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   )
 }
