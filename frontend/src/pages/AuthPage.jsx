@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
+import { loginUser, registerUser } from '../services/api.js'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/
 
 function getRouteByRole(role) {
-  if (role === 'ngo') {
+  if (role === 'NGO') {
     return '/ngo'
   }
 
-  if (role === 'admin') {
+  if (role === 'ADMIN') {
     return '/admin'
   }
 
@@ -21,6 +22,7 @@ function AuthPage() {
   const [mode, setMode] = useState('login')
   const [formData, setFormData] = useState({ username: '', email: '', password: '' })
   const [errors, setErrors] = useState({})
+  const [loading, setLoading] = useState(false)
   const { login, register } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -36,6 +38,10 @@ function AuthPage() {
   const onInputChange = (event) => {
     const { name, value } = event.target
     setFormData((previous) => ({ ...previous, [name]: value }))
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }))
+    }
   }
 
   const validate = () => {
@@ -59,32 +65,54 @@ function AuthPage() {
     return Object.keys(nextErrors).length === 0
   }
 
-  const onSubmit = (event) => {
+  // BUG FIX: Now calls actual backend API for login/register
+  // BUG FIX: Uses token and role from backend response
+  const onSubmit = async (event) => {
     event.preventDefault()
 
     if (!validate()) {
       return
     }
 
-    const authPayload = {
-      username: formData.username.trim(),
-      email: formData.email.trim(),
-      password: formData.password,
+    setLoading(true)
+    try {
+      const authPayload = {
+        username: formData.username.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+      }
+
+      let response
+      if (mode === 'login') {
+        response = await loginUser(authPayload.email, authPayload.password)
+      } else {
+        response = await registerUser(authPayload.email, authPayload.username, authPayload.password)
+      }
+
+      if (response.user && response.token) {
+        const userPayload = {
+          username: response.user.name || authPayload.username,
+          email: response.user.email || authPayload.email,
+          token: response.token,
+          uid: response.user.uid,
+          role: response.user.role,
+        }
+
+        if (mode === 'login') {
+          login(userPayload)
+        } else {
+          register(userPayload)
+        }
+
+        navigate(getRouteByRole(userPayload.role))
+      } else {
+        setErrors({ submit: response.message || 'Authentication failed' })
+      }
+    } catch (error) {
+      setErrors({ submit: error.message || 'An error occurred. Please try again.' })
+    } finally {
+      setLoading(false)
     }
-
-    if (mode === 'login') {
-      login(authPayload)
-    } else {
-      register(authPayload)
-    }
-
-    const role = authPayload.email.toLowerCase().includes('admin')
-      ? 'admin'
-      : authPayload.email.toLowerCase().includes('ngo')
-        ? 'ngo'
-        : 'donor'
-
-    navigate(getRouteByRole(role))
   }
 
   return (
@@ -92,8 +120,9 @@ function AuthPage() {
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-bold text-slate-900">{mode === 'login' ? 'Login' : 'Register'} to SurplusX</h1>
         <p className="mt-2 text-sm text-slate-600">
-          Use <span className="font-semibold">ngo</span> or <span className="font-semibold">admin</span> in email to
-          simulate role login.
+          {mode === 'register'
+            ? 'Role is assigned based on email domain. Email body can contain ngo or admin to set role.'
+            : 'Login with your credentials'}
         </p>
 
         <div className="mt-4 grid grid-cols-2 rounded-lg bg-slate-100 p-1">
@@ -101,8 +130,12 @@ function AuthPage() {
             className={`rounded-md px-3 py-2 text-sm font-medium ${
               mode === 'login' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'
             }`}
-            onClick={() => setMode('login')}
+            onClick={() => {
+              setMode('login')
+              setErrors({})
+            }}
             type="button"
+            disabled={loading}
           >
             Login
           </button>
@@ -110,14 +143,20 @@ function AuthPage() {
             className={`rounded-md px-3 py-2 text-sm font-medium ${
               mode === 'register' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'
             }`}
-            onClick={() => setMode('register')}
+            onClick={() => {
+              setMode('register')
+              setErrors({})
+            }}
             type="button"
+            disabled={loading}
           >
             Register
           </button>
         </div>
 
         <form className="mt-5 space-y-4" onSubmit={onSubmit}>
+          {errors.submit && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{errors.submit}</div>}
+
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="username">
               Username
@@ -129,6 +168,7 @@ function AuthPage() {
               onChange={onInputChange}
               type="text"
               value={formData.username}
+              disabled={loading}
             />
             {errors.username && <p className="mt-1 text-xs text-red-600">{errors.username}</p>}
           </div>
@@ -144,6 +184,7 @@ function AuthPage() {
               onChange={onInputChange}
               type="email"
               value={formData.email}
+              disabled={loading}
             />
             {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
           </div>
@@ -159,15 +200,17 @@ function AuthPage() {
               onChange={onInputChange}
               type="password"
               value={formData.password}
+              disabled={loading}
             />
             {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
           </div>
 
           <button
-            className="w-full rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white transition hover:bg-emerald-700"
+            className="w-full rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white transition hover:bg-emerald-700 disabled:opacity-50"
             type="submit"
+            disabled={loading}
           >
-            {mode === 'login' ? 'Login' : 'Create Account'}
+            {loading ? 'Processing...' : mode === 'login' ? 'Login' : 'Create Account'}
           </button>
         </form>
       </section>

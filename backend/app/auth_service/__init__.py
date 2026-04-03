@@ -1,14 +1,28 @@
-from .verification import verifyUser, verifyEmail, verifyPasswordByUsername, verifyPasswordByEmail
+from .verification import verifyEmail, verifyPasswordByEmail
+from .registration import registerUser
+from app.db_models import User
+from typing import Optional, Dict, Any
 
-def loginWithUsername(user: str, password: str) -> bool:
-    if verifyUser(user) and verifyPasswordByUsername(user, password):
-        return True
-    return False
-
-def loginWithEmail(email: str, password: str) -> bool:
+def loginWithEmail(email: str, password: str) -> Optional[Dict[str, Any]]:
+    """Authenticate user by email and return user data if successful.
+    
+    BUG FIX #2: Uses case-insensitive email lookup
+    """
+    if not email or not password:
+        return None
+    
     if verifyEmail(email) and verifyPasswordByEmail(email, password):
-        return True
-    return False
+        # Use lowercase email for consistent database lookup
+        user_obj = User.query.filter_by(email=email.lower()).first()
+        if user_obj:
+            return {
+                'uid': user_obj.uid,
+                'name': user_obj.name,
+                'email': user_obj.email,
+                'role': user_obj.role
+            }
+    return None
 
 
-# Register a new user
+# Export functions for external use
+__all__ = ['loginWithEmail', 'registerUser']

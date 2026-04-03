@@ -2,19 +2,6 @@ import { createContext, useState } from 'react'
 
 const AuthContext = createContext(null)
 
-function resolveRole(email) {
-  const normalizedEmail = email.toLowerCase()
-  if (normalizedEmail.includes('admin')) {
-    return 'admin'
-  }
-
-  if (normalizedEmail.includes('ngo')) {
-    return 'ngo'
-  }
-
-  return 'donor'
-}
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const savedAuth = localStorage.getItem('surplusx-auth')
@@ -34,14 +21,14 @@ export function AuthProvider({ children }) {
     setUser(authUser)
   }
 
-  const login = ({ username, email }) => {
-    const role = resolveRole(email)
-    saveUser({ username, email, role })
+  // BUG FIX #1: Now uses token-based auth from backend instead of email pattern
+  // BUG FIX #2: Uses actual role from backend instead of parsing email
+  const login = ({ username, email, token, uid, role }) => {
+    saveUser({ username, email, token, uid, role })
   }
 
-  const register = ({ username, email }) => {
-    const role = resolveRole(email)
-    saveUser({ username, email, role })
+  const register = ({ username, email, token, uid, role }) => {
+    saveUser({ username, email, token, uid, role })
   }
 
   const logout = () => {
@@ -51,7 +38,7 @@ export function AuthProvider({ children }) {
 
   const value = {
     user,
-    isAuthenticated: Boolean(user),
+    isAuthenticated: Boolean(user && user.token),
     login,
     register,
     logout,
