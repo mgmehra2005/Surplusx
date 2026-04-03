@@ -210,35 +210,35 @@ function LandingPage() {
           {/* Impact Cards Grid */}
           <div className="flex flex-col items-center justify-center gap-8 md:flex-row md:gap-12">
             {/* Meals Card */}
-            <div className="group relative w-full min-h-[220px] max-w-[300px] transform rounded-[2rem] border border-slate-100 bg-slate-50 p-10 text-center transition-all duration-500 hover:scale-105 md:-rotate-2">
+            <div className="group relative w-full min-h-[240px] max-w-[320px] rounded-[2.5rem] border-2 border-slate-100 bg-white p-10 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-600/20 hover:shadow-lg hover:shadow-emerald-600/5">
               <span className="font-instrument block text-5xl tracking-tight text-emerald-600 md:text-6xl">
                 <CountUp end={1240} suffix="+" />
               </span>
               <div className="mt-6">
-                <p className="font-medium text-slate-900">Meals</p>
-                <p className="text-sm text-slate-500">Redistributed</p>
+                <p className="font-instrument text-xl font-medium text-slate-900">Meals</p>
+                <p className="font-instrument text-[15px] text-slate-500">Redistributed</p>
               </div>
             </div>
 
             {/* Network Card */}
-            <div className="group relative w-full min-h-[220px] max-w-[300px] transform rounded-[2rem] border border-slate-100 bg-slate-50 p-10 text-center transition-all duration-500 hover:scale-105">
+            <div className="group relative w-full min-h-[240px] max-w-[320px] rounded-[2.5rem] border-2 border-slate-100 bg-white p-10 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-600/20 hover:shadow-lg hover:shadow-emerald-600/5">
               <span className="font-instrument block text-5xl tracking-tight text-emerald-600 md:text-6xl">
                 <CountUp end={320} suffix="+" />
               </span>
               <div className="mt-6">
-                <p className="font-medium text-slate-900">Active</p>
-                <p className="text-sm text-slate-500">Network</p>
+                <p className="font-instrument text-xl font-medium text-slate-900">Active</p>
+                <p className="font-instrument text-[15px] text-slate-500">Network</p>
               </div>
             </div>
 
             {/* Waste Card */}
-            <div className="group relative w-full min-h-[220px] max-w-[300px] transform rounded-[2rem] border border-slate-100 bg-slate-50 p-10 text-center transition-all duration-500 hover:scale-105 md:rotate-2">
+            <div className="group relative w-full min-h-[240px] max-w-[320px] rounded-[2.5rem] border-2 border-slate-100 bg-white p-10 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-600/20 hover:shadow-lg hover:shadow-emerald-600/5">
               <span className="font-instrument block text-5xl tracking-tight text-emerald-600 md:text-6xl">
                 <CountUp end={3.8} decimals={1} suffix=" Tons" />
               </span>
               <div className="mt-6">
-                <p className="font-medium text-slate-900">Waste</p>
-                <p className="text-sm text-slate-500">Prevented</p>
+                <p className="font-instrument text-xl font-medium text-slate-900">Waste</p>
+                <p className="font-instrument text-[15px] text-slate-500">Prevented</p>
               </div>
             </div>
           </div>
