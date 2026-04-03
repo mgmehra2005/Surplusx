@@ -1,4 +1,25 @@
 services:
+  db:
+    image: mysql:8.0
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: surplusx
+      MYSQL_USER: surplusx_user
+      MYSQL_PASSWORD: surplusx_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 5s
+    networks:
+      - surplusx_network
+
   backend:
     build: ./backend
     ports:
@@ -7,13 +28,30 @@ services:
       - ./backend:/app
     env_file:
       - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FLASK_ENV: development
+      FLASK_DEBUG: "true"
+      MYSQL_HOST: db
+      MYSQL_USER: surplusx_user
+      MYSQL_PASSWORD: surplusx_password
+    networks:
+      - surplusx_network
+
   frontend:
     build: ./frontend
     ports:
       - "3000:3000"
     env_file:
       - .env
-  db:
-    image: mysql:8.0
-    env_file:
-      - .env
+    networks:
+      - surplusx_network
+
+networks:
+  surplusx_network:
+    driver: bridge
+
+volumes:
+  mysql_data:

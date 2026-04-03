@@ -10,7 +10,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* Removed scroll-behavior to allow GSAP and ScrollToTop to handle transitions without conflicts */
 }
 
 body {

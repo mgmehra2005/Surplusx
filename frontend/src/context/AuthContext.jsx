@@ -3,19 +3,6 @@ import { loginUser, registerUser } from '../services/api.js'
 
 const AuthContext = createContext(null)
 
-function resolveRole(email) {
-  const normalizedEmail = email.toLowerCase()
-  if (normalizedEmail.includes('admin')) {
-    return 'admin'
-  }
-
-  if (normalizedEmail.includes('ngo')) {
-    return 'ngo'
-  }
-
-  return 'donor'
-}
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const savedAuth = localStorage.getItem('surplusx-auth')

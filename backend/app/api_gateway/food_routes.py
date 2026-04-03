@@ -1,6 +1,10 @@
-from app import app
+from app import app, db
 from flask import request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy.orm import joinedload
 import app.ai_service as ais
+from app.db_models import FoodListing, User
+from app.utils import sanitize_input
 from datetime import datetime
 
 @app.route('/api/food/add', methods=['POST'])

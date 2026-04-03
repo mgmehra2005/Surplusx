@@ -5,6 +5,7 @@ import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 import heroImg from '../../assets/hero_img.png'
 import donorImg from '../../assets/donor_img.png'
 import ngoImg from '../../assets/ngo_img.png'
+import Footer from '../components/Footer.jsx'
 
 gsap.registerPlugin(ScrollToPlugin)
 
@@ -41,16 +42,36 @@ function LandingPage() {
   const [activeRole, setActiveRole] = useState('donors') // 'donors' or 'ngos'
   const { hash } = useLocation()
 
+  const location = useLocation()
+
   useEffect(() => {
-    if (hash) {
-      const target = hash.startsWith('#') ? hash : `#${hash}`
+    const scrollToId = (id) => {
+      const isHome = id === 'home' || id === 'top'
       gsap.to(window, {
         duration: 1.2,
-        scrollTo: { y: target, autoKill: false, offsetY: 100 },
-        ease: 'power3.inOut',
+        scrollTo: { 
+          y: isHome ? 0 : `#${id}`, 
+          autoKill: false, 
+          offsetY: isHome ? 0 : 100 
+        },
+        ease: 'power4.inOut',
+        overwrite: 'all',
       })
     }
-  }, [hash])
+
+    // 1. Handle navigation from of state (cross-page)
+    if (location.state?.scrollTo) {
+      scrollToId(location.state.scrollTo)
+      // Clear state to avoid scrolling again on back nav
+      window.history.replaceState({}, document.title)
+    }
+
+    // 2. Handle same-page internal clicking
+    const handleEvent = (e) => scrollToId(e.detail)
+    window.addEventListener('scrollToSection', handleEvent)
+
+    return () => window.removeEventListener('scrollToSection', handleEvent)
+  }, [location])
 
   const content = {
     donors: {
@@ -87,16 +108,17 @@ function LandingPage() {
             <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row md:items-start">
               <Link
                 to="/auth"
+                state={{ mode: 'register' }}
                 className="font-instrument rounded-full bg-emerald-600 px-10 py-2 text-[15px] font-medium text-white transition-all hover:bg-emerald-700"
               >
                 Join the Network
               </Link>
-              <Link
-                to="/#how-it-works"
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('scrollToSection', { detail: 'how-it-works' }))}
                 className="font-instrument rounded-full border border-slate-200 bg-white px-10 py-2 text-[15px] font-medium text-slate-900 transition-all hover:bg-slate-50"
               >
                 See the Flow
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -244,6 +266,7 @@ function LandingPage() {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   )
 }
