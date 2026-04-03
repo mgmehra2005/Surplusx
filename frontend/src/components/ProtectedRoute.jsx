@@ -8,7 +8,8 @@ function ProtectedRoute({ allowedRoles }) {
     return <Navigate to="/auth" replace />
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  // BUG FIX: Compare roles correctly - backend returns uppercase (DONOR, NGO, ADMIN)
+  if (allowedRoles && !allowedRoles.includes(user?.role)) {
     return <Navigate to="/" replace />
   }
 

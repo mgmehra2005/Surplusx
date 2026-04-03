@@ -6,35 +6,47 @@ from sqlalchemy.orm import attributes, PassiveFlag
 
 class User(db.Model):
     __tablename__ = 'users'
+    __table_args__ = (
+        db.Index('ix_user_email', 'email'),
+        db.Index('ix_user_role', 'role'),
+    )
+    
     uid = db.Column(db.String(36), primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     phone = db.Column(db.String(20))
-    role = db.Column(db.Enum('DONOR', 'NGO', 'DELIVERY_PARTNER', 'ADMIN'), nullable=False)
+    role = db.Column(db.Enum('DONOR', 'NGO', 'DELIVERY_PARTNER', 'ADMIN'), nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    food_listings = db.relationship('FoodListing', backref='donor', lazy=True)
+    food_listings = db.relationship('FoodListing', backref='donor', lazy='joined')
     ngo_profile = db.relationship('NGO', backref='user', uselist=False)
     dp_profile = db.relationship('DeliveryPartner', backref='user', uselist=False)
 
 class FoodListing(db.Model):
     __tablename__ = 'food_listings'
+    __table_args__ = (
+        db.Index('ix_food_donor_id', 'donor_id'),
+        db.Index('ix_food_status', 'status'),
+        db.Index('ix_food_expiry_date', 'expiry_date'),
+        db.Index('ix_food_food_type', 'food_type'),
+    )
+    
     fid = db.Column(db.String(36), primary_key=True)
-    donor_id = db.Column(db.String(36), db.ForeignKey('users.uid'), nullable=False)
+    donor_id = db.Column(db.String(36), db.ForeignKey('users.uid'), nullable=False, index=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
-    food_type = db.Column(db.Enum('prepared', 'raw', 'packaged', 'baked'), nullable=False)
+    food_type = db.Column(db.Enum('prepared', 'raw', 'packaged', 'baked'), nullable=False, index=True)
     quantity = db.Column(db.Float, nullable=False)
     quantity_unit = db.Column(db.Enum('kg', 'g', 'units', 'liters'), nullable=False)
     preparation_date = db.Column(db.DateTime)
-    expiry_date = db.Column(db.DateTime, nullable=False)
+    expiry_date = db.Column(db.DateTime, nullable=False, index=True)
     
     # Location stored as JSON for production flexibility
     location = db.Column(db.JSON) # {latitude, longitude, address}
-    status = db.Column(db.Enum('AVAILABLE', 'MATCHED', 'PICKED_UP', 'DELIVERED', 'EXPIRED'), default='AVAILABLE')
+    status = db.Column(db.Enum('AVAILABLE', 'MATCHED', 'PICKED_UP', 'DELIVERED', 'EXPIRED'), default='AVAILABLE', index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

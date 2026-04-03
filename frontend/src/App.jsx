@@ -27,15 +27,16 @@ function App() {
         <Route element={<LandingPage />} path="/" />
         <Route element={<AuthPage />} path="/auth" />
 
-        <Route element={<ProtectedRoute allowedRoles={['donor']} />}>
+        {/* BUG FIX: Use uppercase role names to match backend values */}
+        <Route element={<ProtectedRoute allowedRoles={['DONOR']} />}>
           <Route element={<DonorDashboard />} path="/donor" />
         </Route>
 
-        <Route element={<ProtectedRoute allowedRoles={['ngo']} />}>
+        <Route element={<ProtectedRoute allowedRoles={['NGO']} />}>
           <Route element={<NGODashboard />} path="/ngo" />
         </Route>
 
-        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+        <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
           <Route element={<AdminPanel />} path="/admin" />
         </Route>
 

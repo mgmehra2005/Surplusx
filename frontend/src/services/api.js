@@ -1,86 +1,145 @@
 import axios from 'axios'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+
 export const apiClient = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: API_BASE_URL,
 })
 
-/*
-  TODO: Connect to Flask API: http://localhost:5000/api/....
-  This service intentionally returns mock data right now.
-  Replace these mocked async functions with real axios calls when backend APIs are finalized.
-*/
-
-const delay = (ms = 250) => new Promise((resolve) => {
-  setTimeout(resolve, ms)
+// Add JWT token to all requests
+apiClient.interceptors.request.use((config) => {
+  const auth = localStorage.getItem('surplusx-auth')
+  if (auth) {
+    try {
+      const authData = JSON.parse(auth)
+      if (authData.token) {
+        config.headers.Authorization = `Bearer ${authData.token}`
+      }
+    } catch (e) {
+      console.error('Failed to parse auth data:', e)
+    }
+  }
+  return config
 })
 
-let donorDonations = [
-  {
-    id: 1,
-    name: 'Cooked Rice Packs',
-    type: 'Cooked Meal',
-    preparationTime: '2026-03-30T08:15',
-  },
-  {
-    id: 2,
-    name: 'Fresh Vegetables Box',
-    type: 'Raw Ingredients',
-    preparationTime: '2026-03-30T07:00',
-  },
-]
+// BUG FIX: All functions now call real backend API instead of mock data
 
-let availableFood = [
-  {
-    id: 101,
-    donorName: 'Helping Hands Restaurant',
-    name: 'Veg Biryani',
-    type: 'Cooked Meal',
-    preparationTime: '2026-03-30T09:45',
-  },
-  {
-    id: 102,
-    donorName: 'Green Basket',
-    name: 'Fruit Crates',
-    type: 'Fresh Produce',
-    preparationTime: '2026-03-30T07:30',
-  },
-]
+export async function registerUser(email, username, password, role = 'DONOR') {
+  try {
+    const response = await apiClient.post('/auth/register', {
+      email,
+      name: username,
+      password,
+      role,
+    })
+    return response.data
+  } catch (error) {
+    throw error.response?.data || { message: 'Registration failed' }
+  }
+}
+
+export async function loginUser(email, password) {
+  try {
+    const response = await apiClient.post('/auth/login', {
+      email,
+      password,
+    })
+    return response.data
+  } catch (error) {
+    throw error.response?.data || { message: 'Login failed' }
+  }
+}
 
 export async function getDonorDonations() {
-  await delay()
-  return donorDonations
+  try {
+    const response = await apiClient.get('/food', {
+      params: { status: 'AVAILABLE' },
+    })
+    return response.data.data || []
+  } catch (error) {
+    console.error('Failed to fetch donor donations:', error)
+    return []
+  }
 }
 
 export async function addFoodItem(foodData) {
-  await delay()
-  const newItem = {
-    id: Date.now(),
-    ...foodData,
+  try {
+    const response = await apiClient.post('/food/add', {
+      title: foodData.name,
+      food_type: foodData.type,
+      quantity: foodData.quantity || 1,
+      quantity_unit: foodData.quantity_unit || 'units',
+      preparation_date: foodData.preparationTime || new Date().toISOString(),
+      expiry_date: foodData.expiry_date || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      description: foodData.description,
+      location: foodData.location,
+    })
+    return response.data.data
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to add food item' }
   }
-  donorDonations = [newItem, ...donorDonations]
-  return newItem
 }
 
 export async function getAvailableFoodItems() {
-  await delay()
-  return availableFood
+  try {
+    const response = await apiClient.get('/food', {
+      params: { status: 'AVAILABLE' },
+    })
+    return response.data.data || []
+  } catch (error) {
+    console.error('Failed to fetch available food:', error)
+    return []
+  }
+}
+
+export async function getFoodItemById(foodId) {
+  try {
+    const response = await apiClient.get(`/food/${foodId}`)
+    return response.data.data
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to fetch food item' }
+  }
+}
+
+export async function updateFoodItem(foodId, updates) {
+  try {
+    const response = await apiClient.put(`/food/${foodId}`, updates)
+    return response.data.data
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to update food item' }
+  }
 }
 
 export async function claimFoodItem(itemId) {
-  await delay()
-  availableFood = availableFood.filter((item) => item.id !== itemId)
-  return { success: true }
+  try {
+    const response = await apiClient.put(`/food/${itemId}`, {
+      status: 'MATCHED',
+    })
+    return { success: true, data: response.data.data }
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to claim food item' }
+  }
+}
+
+export async function deleteFoodItem(itemId) {
+  try {
+    await apiClient.delete(`/food/${itemId}`)
+    return { success: true }
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to delete food item' }
+  }
 }
 
 export async function getAdminOverview() {
-  await delay()
-  return {
-    totalUsers: 128,
-    totalFoodRescuedKg: 4210,
-    logs: [
-      'New donor registration approved',
-      'NGO claim completed for donation #102',
-      'System health check: All services operational',
-    ],
+  try {
+    const response = await apiClient.get('/admin/overview')
+    return response.data.data
+  } catch (error) {
+    console.error('Failed to fetch admin overview:', error)
+    return {
+      totalUsers: 0,
+      totalFoodRescuedKg: 0,
+      logs: ['Error loading data'],
+    }
   }
 }
