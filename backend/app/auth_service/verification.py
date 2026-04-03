@@ -5,7 +5,7 @@ def __getPasswordHash__(username: str) -> str:
     """Fetch password hash by username."""
     try:
         user = User.query.filter_by(username=username).first()
-        return user.hashed_password if user else ""
+        return user.password_hash if user else ""
     except Exception as e:
         print(f"Error fetching password hash for username {username}: {e}")
         return ""
@@ -15,7 +15,7 @@ def __getPasswordHashByEmail__(email: str) -> str:
     """Fetch password hash by email."""
     try:
         user = User.query.filter_by(email=email).first()
-        return user.hashed_password if user else ""
+        return user.password_hash if user else ""
     except Exception as e:
         print(f"Error fetching password hash for email {email}: {e}")
         return ""
@@ -45,6 +45,7 @@ def verifyPasswordByUsername(username: str, password: str) -> bool:
         return False
     
     _password_hash_ = __getPasswordHash__(username)
+    print(f"Password hash for {username}: {_password_hash_}")
     if _password_hash_ == "":
         return False
     
@@ -59,4 +60,4 @@ def verifyPasswordByEmail(email: str, password: str) -> bool:
     if _password_hash_ == "":
         return False
     
-    return checkPasswordHash(password, _password_hash_)
+    return checkPasswordHash(_password_hash_, password)

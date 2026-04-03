@@ -1,8 +1,11 @@
+from numpy import rint
+
 from .verification import verifyUser, verifyEmail, verifyPasswordByUsername, verifyPasswordByEmail
 
 
 
 def loginWithUsername(user: str, password: str) -> bool:
+    print("username", verifyUser(user), "\npassword", verifyPasswordByUsername(user, password))
     if verifyUser(user) and verifyPasswordByUsername(user, password):
         return True
     return False
