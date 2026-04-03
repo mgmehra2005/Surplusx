@@ -39,8 +39,8 @@ export function AuthProvider({ children }) {
     saveUser({ username, email, role })
   }
 
-  const register = ({ username, email }) => {
-    const role = resolveRole(email)
+  const register = ({ username, email, role }) => {
+    // For registration, we use the role chosen by the user in the dropdown
     saveUser({ username, email, role })
   }
 

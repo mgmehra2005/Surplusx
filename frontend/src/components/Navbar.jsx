@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth.js'
 import logo from '../assets/transparent_logo.png'
 
 function Navbar() {
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, user, logout } = useAuth()
   const navigate = useNavigate()
 
   const navLinks = [
@@ -50,8 +50,26 @@ function Navbar() {
 
         {/* Right: Actions */}
         <div className="flex flex-1 items-center justify-end space-x-8">
-          {!isAuthenticated ? (
-            <>
+          {isAuthenticated ? (
+            <div className="flex items-center space-x-6">
+              <Link
+                to={['/donor', '/ngo', '/admin'].includes(window.location.pathname) ? '/' : (user.role === 'donor' ? '/donor' : user.role === 'ngo' ? '/ngo' : '/admin')}
+                className="font-instrument rounded-full bg-emerald-600 px-8 py-2 text-[17px] font-medium text-white transition-all hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/10"
+              >
+                {['/donor', '/ngo', '/admin'].includes(window.location.pathname) ? 'Back To Home' : 'Dashboard'}
+              </Link>
+              <button
+                onClick={() => {
+                  logout()
+                  navigate('/')
+                }}
+                className="font-instrument text-[17px] font-medium text-slate-600 transition-colors hover:text-red-500"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-6">
               <Link
                 to="/auth"
                 state={{ mode: 'login' }}
@@ -66,14 +84,7 @@ function Navbar() {
               >
                 Sign Up
               </Link>
-            </>
-          ) : (
-            <Link
-              to={user.role === 'donor' ? '/donor' : user.role === 'ngo' ? '/ngo' : '/admin'}
-              className="font-instrument rounded-full bg-emerald-600 px-8 py-2 text-[17px] font-medium text-white transition-all hover:bg-emerald-700"
-            >
-              Dashboard
-            </Link>
+            </div>
           )}
         </div>
       </nav>

@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth.js'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/
-const phoneRegex = /^\+?[\d\s-]{10,}$/
+const phoneRegex = /^\d{10}$/
 
 function getRouteByRole(role) {
   if (role === 'ngo') {
@@ -27,7 +27,7 @@ function AuthPage() {
     firstName: '',
     lastName: '',
     phone: '',
-    countryCode: '',
+    countryCode: '+91',
     role: '',
     confirmPassword: ''
   })
@@ -60,11 +60,10 @@ function AuthPage() {
       nextErrors.email = 'Please enter a valid email address.'
     }
 
-    if (!passwordRegex.test(formData.password)) {
-      nextErrors.password = 'Must be 8+ chars (upper, lower, num, symbol).'
-    }
-
     if (mode === 'register') {
+      if (!passwordRegex.test(formData.password)) {
+        nextErrors.password = 'Must be 8+ chars (upper, lower, num, symbol).'
+      }
       if (!formData.firstName.trim()) {
         nextErrors.firstName = 'First name is required.'
       }
@@ -74,7 +73,7 @@ function AuthPage() {
       if (!formData.countryCode.trim()) {
         nextErrors.phone = 'Country code and number are required.'
       } else if (!phoneRegex.test(formData.phone.trim())) {
-        nextErrors.phone = 'Please enter a valid phone number.'
+        nextErrors.phone = 'Please enter exactly 10 digits.'
       }
       if (!formData.role) {
         nextErrors.role = 'Please select your role.'
@@ -237,13 +236,12 @@ function AuthPage() {
                 <div className="flex space-x-2">
                   <div className="w-[85px]">
                     <input
-                      className="font-instrument w-full rounded-xl border border-slate-200 px-3 py-2.5 text-[15px] outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 placeholder:text-slate-400"
+                      className="font-instrument w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[15px] text-slate-500 outline-none cursor-not-allowed"
                       id="countryCode"
                       name="countryCode"
-                      placeholder="+91"
-                      onChange={onInputChange}
+                      readOnly
                       type="text"
-                      value={formData.countryCode}
+                      value="+91"
                       required
                     />
                   </div>
@@ -254,7 +252,13 @@ function AuthPage() {
                       name="phone"
                       placeholder="98765 00000"
                       onChange={onInputChange}
+                      onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault()
+                        }
+                      }}
                       type="tel"
+                      maxLength="10"
                       value={formData.phone}
                       required
                     />
@@ -293,7 +297,7 @@ function AuthPage() {
             </div>
           )}
 
-          <div className={`${mode === 'register' ? 'grid grid-cols-2 gap-4' : 'space-y-4'}`}>
+          <div className="space-y-5">
             <div>
               <label className="font-instrument mb-1.5 block text-sm font-medium text-slate-700" htmlFor="password">
                 {mode === 'register' ? 'Create Password' : 'Password'} <span className="text-red-500">*</span>
