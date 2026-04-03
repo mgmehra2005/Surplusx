@@ -5,6 +5,7 @@ import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 import heroImg from '../../assets/hero_img.png'
 import donorImg from '../../assets/donor_img.png'
 import ngoImg from '../../assets/ngo_img.png'
+import Footer from '../components/Footer.jsx'
 
 gsap.registerPlugin(ScrollToPlugin)
 
@@ -244,6 +245,7 @@ function LandingPage() {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   )
 }
