@@ -78,7 +78,7 @@ function LandingPage() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-12 md:flex-row">
           {/* Left Section: Content */}
           <div className="flex flex-col items-center text-center md:w-[50%] md:items-start md:text-left">
-            <h1 className="font-instrument text-4xl leading-[0.95] tracking-tight text-slate-900 md:text-6xl lg:text-7xl">
+            <h1 className="font-parabolica text-4xl leading-[0.95] tracking-tight text-slate-900 md:text-6xl lg:text-6xl">
               AI Infrastructure For <br /> Zero Food Waste
             </h1>
             <p className="mt-6 max-w-sm text-lg text-slate-600 md:mt-4 md:text-xl">
@@ -87,13 +87,13 @@ function LandingPage() {
             <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row md:items-start">
               <Link
                 to="/auth"
-                className="font-instrument rounded-full bg-emerald-600 px-10 py-2 text-[15px] font-medium text-white transition-all hover:bg-emerald-700"
+                className="font-parabolica rounded-full bg-emerald-600 px-10 py-2 text-[15px] font-medium text-white transition-all hover:bg-emerald-700"
               >
                 Join the Network
               </Link>
               <Link
                 to="/#how-it-works"
-                className="font-instrument rounded-full border border-slate-200 bg-white px-10 py-2 text-[15px] font-medium text-slate-900 transition-all hover:bg-slate-50"
+                className="font-parabolica rounded-full border border-slate-200 bg-white px-10 py-2 text-[15px] font-medium text-slate-900 transition-all hover:bg-slate-50"
               >
                 See the Flow
               </Link>
@@ -117,7 +117,7 @@ function LandingPage() {
       <section id="how-it-works" className="px-6 py-16 md:px-16 lg:px-24">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 flex flex-col items-center text-center">
-            <h2 className="font-instrument text-3xl tracking-tight text-slate-900 md:text-4xl">
+            <h2 className="font-parabolica text-3xl tracking-tight text-slate-900 md:text-4xl">
               How SurplusX Works
             </h2>
             <p className="mt-3 max-w-md text-[15px] text-slate-600">
@@ -128,7 +128,7 @@ function LandingPage() {
             <div className="mt-8 flex space-x-1 rounded-full border border-slate-100 bg-slate-50 p-1">
               <button
                 onClick={() => setActiveRole('donors')}
-                className={`font-instrument rounded-full px-6 py-1.5 text-[13px] transition-all ${activeRole === 'donors'
+                className={`font-parabolica rounded-full px-6 py-1.5 text-[13px] transition-all ${activeRole === 'donors'
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'text-slate-500 hover:text-emerald-600'
                   }`}
@@ -137,7 +137,7 @@ function LandingPage() {
               </button>
               <button
                 onClick={() => setActiveRole('ngos')}
-                className={`font-instrument rounded-full px-6 py-1.5 text-[13px] transition-all ${activeRole === 'ngos'
+                className={`font-parabolica rounded-full px-6 py-1.5 text-[13px] transition-all ${activeRole === 'ngos'
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'text-slate-500 hover:text-emerald-600'
                   }`}
@@ -182,7 +182,7 @@ function LandingPage() {
                   <div className="mb-3 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-medium text-white ring-4 ring-emerald-50">
                     {idx + 1}
                   </div>
-                  <h3 className="font-instrument mb-2 text-xl tracking-tight text-slate-900">
+                  <h3 className="font-parabolica mb-2 text-xl tracking-tight text-slate-900">
                     {step.title}
                   </h3>
                   <p className="text-[14px] leading-relaxed text-slate-600">
@@ -199,7 +199,7 @@ function LandingPage() {
       <section id="impact" className="px-6 py-24 md:px-16 lg:px-24">
         <div className="mx-auto max-w-6xl">
           <div className="mb-20 flex flex-col items-center text-center">
-            <h2 className="font-instrument text-3xl tracking-tight text-slate-900 md:text-5xl">
+            <h2 className="font-parabolica text-3xl tracking-tight text-slate-900 md:text-5xl">
               Real-World Impact
             </h2>
             <p className="mt-4 max-w-xl text-slate-600">
@@ -211,7 +211,7 @@ function LandingPage() {
           <div className="flex flex-col items-center justify-center gap-8 md:flex-row md:gap-12">
             {/* Meals Card */}
             <div className="group relative w-full min-h-[220px] max-w-[300px] transform rounded-[2rem] border border-slate-100 bg-slate-50 p-10 text-center transition-all duration-500 hover:scale-105 md:-rotate-2">
-              <span className="font-instrument block text-5xl tracking-tight text-emerald-600 md:text-6xl">
+              <span className="font-parabolica block text-5xl tracking-tight text-emerald-600 md:text-6xl">
                 <CountUp end={1240} suffix="+" />
               </span>
               <div className="mt-6">
@@ -222,7 +222,7 @@ function LandingPage() {
 
             {/* Network Card */}
             <div className="group relative w-full min-h-[220px] max-w-[300px] transform rounded-[2rem] border border-slate-100 bg-slate-50 p-10 text-center transition-all duration-500 hover:scale-105">
-              <span className="font-instrument block text-5xl tracking-tight text-emerald-600 md:text-6xl">
+              <span className="font-parabolica block text-5xl tracking-tight text-emerald-600 md:text-6xl">
                 <CountUp end={320} suffix="+" />
               </span>
               <div className="mt-6">
@@ -233,7 +233,7 @@ function LandingPage() {
 
             {/* Waste Card */}
             <div className="group relative w-full min-h-[220px] max-w-[300px] transform rounded-[2rem] border border-slate-100 bg-slate-50 p-10 text-center transition-all duration-500 hover:scale-105 md:rotate-2">
-              <span className="font-instrument block text-5xl tracking-tight text-emerald-600 md:text-6xl">
+              <span className="font-parabolica block text-5xl tracking-tight text-emerald-600 md:text-6xl">
                 <CountUp end={3.8} decimals={1} suffix=" Tons" />
               </span>
               <div className="mt-6">
