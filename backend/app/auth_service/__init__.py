@@ -1,7 +1,5 @@
-from numpy import rint
-
 from .verification import verifyUser, verifyEmail, verifyPasswordByUsername, verifyPasswordByEmail
-
+import jwt, datetime
 
 
 def loginWithUsername(user: str, password: str) -> bool:
@@ -14,6 +12,3 @@ def loginWithEmail(email: str, password: str) -> bool:
     if verifyEmail(email) and verifyPasswordByEmail(email, password):
         return True
     return False
-
-
-# Register a new user
