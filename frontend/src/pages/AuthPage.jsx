@@ -21,6 +21,7 @@ function getRouteByRole(role) {
 
 function AuthPage() {
   const [mode, setMode] = useState('login')
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -95,8 +96,6 @@ function AuthPage() {
     return Object.keys(nextErrors).length === 0
   }
 
-  // BUG FIX: Now calls actual backend API for login/register
-  // BUG FIX: Uses token and role from backend response
   const onSubmit = async (event) => {
     event.preventDefault()
 
@@ -105,41 +104,38 @@ function AuthPage() {
     }
 
     setLoading(true)
+    setErrors({})
+
     try {
-      const authPayload = {
-        username: formData.username.trim(),
-        email: formData.email.trim(),
-        password: formData.password,
-      }
-
-      let response
       if (mode === 'login') {
-        response = await loginUser(authPayload.email, authPayload.password)
-      } else {
-        response = await registerUser(authPayload.email, authPayload.username, authPayload.password)
-      }
+        const userData = await login({
+          username: formData.username.trim(),
+          password: formData.password,
+        })
 
-      if (response.user && response.token) {
-        const userPayload = {
-          username: response.user.name || authPayload.username,
-          email: response.user.email || authPayload.email,
-          token: response.token,
-          uid: response.user.uid,
-          role: response.user.role,
+        // On success, navigate to the specific dashboard
+        const role = userData?.role || 'donor'
+        navigate(getRouteByRole(role))
+      } else {
+        const authPayload = {
+          username: formData.username.trim(),
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          password: formData.password,
+          email: formData.email.trim(),
+          phone: `${formData.countryCode}${formData.phone.trim()}`,
+          role: formData.role.toUpperCase(),
         }
 
-        if (mode === 'login') {
-          login(userPayload)
-        } else {
-          register(userPayload)
-        }
+        const userData = await register(authPayload)
 
-        navigate(getRouteByRole(userPayload.role))
-      } else {
-        setErrors({ submit: response.message || 'Authentication failed' })
+        // On success, navigate to the specific dashboard
+        const role = userData?.role || 'donor'
+        navigate(getRouteByRole(role))
       }
     } catch (error) {
-      setErrors({ submit: error.message || 'An error occurred. Please try again.' })
+      const message = error.response?.data?.message || 'Authentication failed. Please check your credentials.'
+      setErrors({ form: message })
     } finally {
       setLoading(false)
     }
@@ -184,8 +180,49 @@ function AuthPage() {
           </button>
         </div>
 
-        <form className="mt-5 space-y-4" onSubmit={onSubmit}>
-          {errors.submit && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{errors.submit}</div>}
+        <form className="mt-8 space-y-5" onSubmit={onSubmit}>
+          {errors.form && (
+            <div className="rounded-xl border border-red-100 bg-red-50 p-4 font-instrument text-sm text-red-600">
+              {errors.form}
+            </div>
+          )}
+          {mode === 'register' && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="font-instrument mb-1.5 block text-sm font-medium text-slate-700" htmlFor="firstName">
+                  First Name <span className="text-red-500">*</span>
+                </label>
+                  <input
+                    className="font-instrument w-full rounded-xl border border-slate-200 px-4 py-2.5 text-[15px] outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 placeholder:text-slate-400"
+                    id="firstName"
+                    name="firstName"
+                    placeholder="Rahul"
+                    onChange={onInputChange}
+                    type="text"
+                    value={formData.firstName}
+                    required
+                  />
+                {errors.firstName && <p className="mt-1.5 font-instrument text-xs text-red-500">{errors.firstName}</p>}
+              </div>
+
+              <div>
+                <label className="font-instrument mb-1.5 block text-sm font-medium text-slate-700" htmlFor="lastName">
+                  Last Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  className="font-instrument w-full rounded-xl border border-slate-200 px-4 py-2.5 text-[15px] outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 placeholder:text-slate-400"
+                  id="lastName"
+                  name="lastName"
+                  placeholder="Sharma"
+                  onChange={onInputChange}
+                  type="text"
+                  value={formData.lastName}
+                  required
+                />
+                {errors.lastName && <p className="mt-1.5 font-instrument text-xs text-red-500">{errors.lastName}</p>}
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="font-instrument mb-1.5 block text-sm font-medium text-slate-700" htmlFor="username">
@@ -237,11 +274,18 @@ function AuthPage() {
           </div>
 
           <button
-            className="w-full rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white transition hover:bg-emerald-700 disabled:opacity-50"
+            className="font-instrument flex w-full items-center justify-center rounded-full bg-emerald-600 py-3 text-[15px] font-medium text-white transition-all hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             type="submit"
             disabled={loading}
           >
-            {loading ? 'Processing...' : mode === 'login' ? 'Login' : 'Create Account'}
+            {loading ? (
+              <svg className="h-5 w-5 animate-spin text-white" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              mode === 'login' ? 'Login to Dashboard' : 'Create Account'
+            )}
           </button>
         </form>
       </section>
