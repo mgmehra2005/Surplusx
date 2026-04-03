@@ -6,7 +6,8 @@ from sqlalchemy.orm import attributes, PassiveFlag
 
 class User(db.Model):
     __tablename__ = 'users'
-    uid = db.Column(db.String(36), primary_key=True)
+    uid = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     phone = db.Column(db.String(20))
@@ -20,10 +21,18 @@ class User(db.Model):
     ngo_profile = db.relationship('NGO', backref='user', uselist=False)
     dp_profile = db.relationship('DeliveryPartner', backref='user', uselist=False)
 
+    def __init__(self, username: str, name: str, email: str, phone: str, role: str, password_hash: str) -> None:
+        self.username = username
+        self.name = name
+        self.email = email
+        self.phone = phone
+        self.role = role
+        self.password_hash = password_hash
+
 class FoodListing(db.Model):
     __tablename__ = 'food_listings'
-    fid = db.Column(db.String(36), primary_key=True)
-    donor_id = db.Column(db.String(36), db.ForeignKey('users.uid'), nullable=False)
+    fid = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    donor_id = db.Column(db.Integer, db.ForeignKey('users.uid'), nullable=False)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     food_type = db.Column(db.Enum('prepared', 'raw', 'packaged', 'baked'), nullable=False)
@@ -38,10 +47,20 @@ class FoodListing(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    def __init__(self, title:str, description:str, food_type:str, quantity:float, quantity_unit:str, expiry_date:datetime, location:dict) -> None:
+        self.title = title
+        self.description = description
+        self.food_type = food_type
+        self.quantity = quantity
+        self.quantity_unit = quantity_unit
+        self.expiry_date = expiry_date
+        self.location = location
+
+
 class NGO(db.Model):
     __tablename__ = 'ngos'
-    ngo_id = db.Column(db.String(36), primary_key=True)
-    user_uid = db.Column(db.String(36), db.ForeignKey('users.uid'), nullable=False)
+    ngo_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_uid = db.Column(db.Integer, db.ForeignKey('users.uid'), nullable=False)
     name = db.Column(db.String(200), nullable=False)
     location = db.Column(db.JSON)
     max_capacity = db.Column(db.Integer)
@@ -50,26 +69,50 @@ class NGO(db.Model):
     contact_person = db.Column(db.String(100))
     contact_phone = db.Column(db.String(20))
 
+    def __init__(self, name:str, location:dict, max_capacity:int, food_preferences:list, contact_person:str, contact_phone:str) -> None:
+        self.name = name
+        self.location = location
+        self.max_capacity = max_capacity
+        self.food_preferences = food_preferences
+        self.contact_person = contact_person
+        self.contact_phone = contact_phone
+
 class DeliveryPartner(db.Model):
     __tablename__ = 'delivery_partners'
-    dp_id = db.Column(db.String(36), primary_key=True)
-    user_uid = db.Column(db.String(36), db.ForeignKey('users.uid'), nullable=False)
+    dp_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_uid = db.Column(db.Integer, db.ForeignKey('users.uid'))
     fullname = db.Column(db.String(100))
     address = db.Column(db.Text)
     vehicle_details = db.Column(db.JSON) # {number, license, rc}
 
+    def __init__(self, fullname:str, address:str, vehicle_details:dict) -> None:
+        self.fullname = fullname
+        self.address = address
+        self.vehicle_details = vehicle_details
+
 class Delivery(db.Model):
     __tablename__ = 'deliveries'
-    delivery_id = db.Column(db.String(36), primary_key=True)
-    dp_id = db.Column(db.String(36), db.ForeignKey('delivery_partners.dp_id'))
-    food_id = db.Column(db.String(36), db.ForeignKey('food_listings.fid'))
-    ngo_id = db.Column(db.String(36), db.ForeignKey('ngos.ngo_id'))
-    donor_id = db.Column(db.String(36), db.ForeignKey('users.uid'))
+    delivery_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    dp_id = db.Column(db.Integer, db.ForeignKey('delivery_partners.dp_id'), nullable=False)
+    food_id = db.Column(db.Integer, db.ForeignKey('food_listings.fid'), nullable=False)
+    ngo_id = db.Column(db.Integer, db.ForeignKey('ngos.ngo_id'), nullable=False)
+    donor_id = db.Column(db.Integer, db.ForeignKey('users.uid'), nullable=False)
     pickup_time = db.Column(db.DateTime)
     delivery_time = db.Column(db.DateTime)
     time_taken = db.Column(db.String(50)) # Calculated duration
     location_pickup = db.Column(db.Text)
     location_drop = db.Column(db.Text)
+
+    def __init__(self, dp_id:int, food_id:int, ngo_id:int, donor_id:int, pickup_time:datetime, delivery_time:datetime, location_pickup:str, location_drop:str) -> None:
+        self.dp_id = dp_id
+        self.food_id = food_id
+        self.ngo_id = ngo_id
+        self.donor_id = donor_id
+        self.pickup_time = pickup_time
+        self.delivery_time = delivery_time
+        self.time_taken = str(delivery_time - pickup_time) if pickup_time and delivery_time else None
+        self.location_pickup = location_pickup
+        self.location_drop = location_drop
 
 class SystemLog(db.Model):
     __tablename__ = 'system_logs'
