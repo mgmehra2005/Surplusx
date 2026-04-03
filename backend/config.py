@@ -1,5 +1,6 @@
 import os
 from sqlalchemy.pool import QueuePool
+import warnings
 
 
 class Config:
@@ -8,16 +9,21 @@ class Config:
     # Security - Prevent hardcoded defaults in production
     SECRET_KEY = os.environ.get("SECRET_KEY")
     if not SECRET_KEY:
+        warnings.warn("SECRET_KEY not set in environment. Using development default. Set SECRET_KEY for production.", RuntimeWarning)
         SECRET_KEY = "dev-secret-key"  # Dev only
     
     DEBUG = False
 
-    # Database settings
+    # Database settings with validation
     DB_HOST = os.environ.get("MYSQL_HOST", "localhost")
     DB_PORT = int(os.environ.get("MYSQL_PORT", 3306))
     DB_USER = os.environ.get("MYSQL_USER", "root")
     DB_PASSWORD = os.environ.get("MYSQL_PASSWORD", "")
     DB_NAME = os.environ.get("MYSQL_DATABASE", "surplusx")
+    
+    # Warn if using default/empty password in non-dev environments
+    if os.environ.get("ENVIRONMENT", "development") == "production" and not DB_PASSWORD:
+        warnings.warn("Database password is empty. Set MYSQL_PASSWORD for production.", RuntimeWarning)
     
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -36,6 +42,8 @@ class Config:
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
     if not JWT_SECRET_KEY:
         JWT_SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
+        if JWT_SECRET_KEY == "dev-secret-key":
+            warnings.warn("JWT_SECRET_KEY not set. Using development default. Set JWT_SECRET_KEY for production.", RuntimeWarning)
     
     JWT_ACCESS_TOKEN_EXPIRES = int(os.environ.get("JWT_ACCESS_TOKEN_EXPIRES", 86400))  # 24 hours
     JWT_ALGORITHM = "HS256"

@@ -172,7 +172,10 @@ def validate_date_range(date_str, allow_past=False):
         return True, dt, "Date is valid"
         
     except (ValueError, TypeError) as e:
-        return False, None, f"Invalid date format. Use ISO 8601 (YYYY-MM-DDTHH:MM:SS): {str(e)}"
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.debug(f"Date parsing error: {str(e)}")
+        return False, None, "Invalid date format. Use ISO 8601 (YYYY-MM-DDTHH:MM:SS)"
 
 
 def validate_quantity(quantity, min_value=0.01, max_value=1000000):

@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy.orm import joinedload
 import app.ai_service as ais
 from app.db_models import FoodListing, User
+from app.utils import sanitize_input
 from datetime import datetime
 import uuid
 import json
@@ -66,12 +67,12 @@ def add_food():
             except TypeError:
                 return jsonify({"message": "Invalid location format"}), 400
         
-        # Create food listing
+        # Create food listing with sanitized inputs
         food_listing = FoodListing(
             fid=str(uuid.uuid4()),
             donor_id=donor_id,
-            title=data['title'],
-            description=data.get('description', ''),
+            title=sanitize_input(data['title'], max_length=200),
+            description=sanitize_input(data.get('description', ''), max_length=2000),
             food_type=data['food_type'],
             quantity=float(data['quantity']),
             quantity_unit=data['quantity_unit'],
@@ -101,28 +102,46 @@ def add_food():
     
     except Exception as e:
         db.session.rollback()
-        logger.error(f"Error adding food: {str(e)}", exc_info=True)
+        logger.error(f"Error adding food", exc_info=True)
         return jsonify({"message": "Failed to add food item. Please try again."}), 500
 
 
 @app.route('/api/food', methods=['GET'])
 @jwt_required()
 def get_food_listings():
-    """Get all available food listings or filter by status."""
+    """Get all available food listings or filter by status with pagination."""
     try:
         status = request.args.get('status', 'AVAILABLE')
+        page = request.args.get('page', 1, type=int)
+        limit = request.args.get('limit', 10, type=int)
+        
+        # Validate pagination parameters
+        if page < 1:
+            page = 1
+        if limit < 1 or limit > 100:  # Max 100 items per page
+            limit = 10
+        offset = (page - 1) * limit
         
         # Validate status
         valid_statuses = ['AVAILABLE', 'MATCHED', 'PICKED_UP', 'DELIVERED', 'EXPIRED']
         if status not in valid_statuses:
             return jsonify({"message": f"Invalid status. Must be one of: {', '.join(valid_statuses)}"}), 400
         
+        # Get total count for pagination
+        total_count = FoodListing.query.filter_by(status=status).count()
+        
         listings = FoodListing.query.options(
             joinedload(FoodListing.donor)
-        ).filter_by(status=status).all()
+        ).filter_by(status=status).limit(limit).offset(offset).all()
         
         return jsonify({
             "message": "Food listings retrieved",
+            "pagination": {
+                "page": page,
+                "limit": limit,
+                "total": total_count,
+                "pages": (total_count + limit - 1) // limit
+            },
             "count": len(listings),
             "data": [
                 {
@@ -146,7 +165,8 @@ def get_food_listings():
         }), 200
     
     except Exception as e:
-        return jsonify({"message": f"Error retrieving listings: {str(e)}"}), 500
+        logger.error(f"Error retrieving listings", exc_info=True)
+        return jsonify({"message": "Failed to retrieve listings. Please try again."}), 500
 
 
 @app.route('/api/food/<fid>', methods=['GET'])
@@ -184,7 +204,8 @@ def get_food_by_id(fid):
         }), 200
     
     except Exception as e:
-        return jsonify({"message": f"Error retrieving listing: {str(e)}"}), 500
+        logger.error(f"Error retrieving listing", exc_info=True)
+        return jsonify({"message": "Failed to retrieve listing. Please try again."}), 500
 
 
 @app.route('/api/food/<fid>', methods=['PUT'])
@@ -206,11 +227,11 @@ def update_food(fid):
         if not data:
             return jsonify({"message": "Request body must be JSON"}), 400
         
-        # Update allowed fields
+        # Update allowed fields with sanitization
         if 'title' in data:
-            listing.title = data['title']
+            listing.title = sanitize_input(data['title'], max_length=200)
         if 'description' in data:
-            listing.description = data['description']
+            listing.description = sanitize_input(data['description'], max_length=2000)
         if 'status' in data:
             valid_statuses = ['AVAILABLE', 'MATCHED', 'PICKED_UP', 'DELIVERED', 'EXPIRED']
             if data['status'] not in valid_statuses:
@@ -233,7 +254,8 @@ def update_food(fid):
     
     except Exception as e:
         db.session.rollback()
-        return jsonify({"message": f"Error updating listing: {str(e)}"}), 500
+        logger.error(f"Error updating listing", exc_info=True)
+        return jsonify({"message": "Failed to update listing. Please try again."}), 500
 
 
 @app.route('/api/food/<fid>', methods=['DELETE'])
@@ -258,4 +280,5 @@ def delete_food(fid):
     
     except Exception as e:
         db.session.rollback()
-        return jsonify({"message": f"Error deleting listing: {str(e)}"}), 500
+        logger.error(f"Error deleting listing", exc_info=True)
+        return jsonify({"message": "Failed to delete listing. Please try again."}), 500
