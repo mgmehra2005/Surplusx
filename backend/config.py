@@ -102,11 +102,6 @@ class ProductionConfig(Config):
 # Validate production config on import if needed
 if os.environ.get("FLASK_ENV") == "production":
     ProductionConfig.validate()
-    
-    def __init__(self):
-        # Require SECRET_KEY in production
-        if not os.environ.get("SECRET_KEY"):
-            raise ValueError("SECRET_KEY environment variable must be set in production")
 
 
 config = {

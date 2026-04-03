@@ -1,10 +1,11 @@
 from app import app
 from flask import request, jsonify
+from flask_jwt_extended import create_access_token
 from app.auth_service import loginWithEmail, loginWithUsername
 from app.auth_service.registration import registerUser
 from app.db_models.utils import _getUserRoleByUsername, _getUserRoleByEmail
+from app.utils import normalize_email, sanitize_input
 
-print("Setting up authentication routes...")
 @app.route('/api/auth/register', methods=['POST'])
 def register():
     """Register a new user account.
@@ -42,19 +43,54 @@ def register():
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
+    """Login with username or email.
+    
+    BUG FIX: Now returns JWT token in response
+    
+    Request JSON:
+    {
+        "username": "user@example.com" or "username",
+        "password": "password123"
+    }
+    """
     data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
+    
+    if not data:
+        return jsonify({"message": "Request body is required"}), 400
+    
+    username = data.get('username', '').strip()
+    password = data.get('password', '')
+    
+    if not username or not password:
+        return jsonify({"message": "Username/email and password are required"}), 400
+    
     if "@" in username:
+        # Login with email
         login_status = loginWithEmail(username, password)
         if login_status:
-            return jsonify({"message": "Login successful with email!", "role": _getUserRoleByEmail(username)}), 200
+            role = _getUserRoleByEmail(username)
+            token = create_access_token(identity=username)
+            return jsonify({
+                "message": "Login successful with email!",
+                "token": token,
+                "username": username,
+                "email": username,
+                "role": role
+            }), 200
         else:
             return jsonify({"message": "Invalid email or password!"}), 401
     else:
+        # Login with username
         login_status = loginWithUsername(username, password)
         if login_status:
-            return jsonify({"message": "Login successful with username!", "role": _getUserRoleByUsername(username)}), 200
+            role = _getUserRoleByUsername(username)
+            token = create_access_token(identity=username)
+            return jsonify({
+                "message": "Login successful with username!",
+                "token": token,
+                "username": username,
+                "role": role
+            }), 200
         else:
             return jsonify({"message": "Invalid username or password!"}), 401
         

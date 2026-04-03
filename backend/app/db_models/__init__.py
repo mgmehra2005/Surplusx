@@ -24,6 +24,18 @@ class User(db.Model):
     food_listings = db.relationship('FoodListing', backref='donor', lazy='joined')
     ngo_profile = db.relationship('NGO', backref='user', uselist=False)
     dp_profile = db.relationship('DeliveryPartner', backref='user', uselist=False)
+    
+    def to_dict(self):
+        """Convert User to dictionary for JSON serialization."""
+        return {
+            'uid': self.uid,
+            'name': self.name,
+            'email': self.email,
+            'phone': self.phone,
+            'role': self.role,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
 
 class FoodListing(db.Model):
     __tablename__ = 'food_listings'
@@ -47,8 +59,28 @@ class FoodListing(db.Model):
     # Location stored as JSON for production flexibility
     location = db.Column(db.JSON) # {latitude, longitude, address}
     status = db.Column(db.Enum('AVAILABLE', 'MATCHED', 'PICKED_UP', 'DELIVERED', 'EXPIRED'), default='AVAILABLE', index=True)
+    freshness_score = db.Column(db.Float, default=0.0)  # BUG FIX: Added to store calculated score
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def to_dict(self):
+        """Convert FoodListing to dictionary for JSON serialization."""
+        return {
+            'id': self.fid,
+            'donor_id': self.donor_id,
+            'title': self.title,
+            'description': self.description,
+            'food_type': self.food_type,
+            'quantity': self.quantity,
+            'quantity_unit': self.quantity_unit,
+            'preparation_date': self.preparation_date.isoformat() if self.preparation_date else None,
+            'expiry_date': self.expiry_date.isoformat() if self.expiry_date else None,
+            'location': self.location,
+            'status': self.status,
+            'freshness_score': self.freshness_score,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
 
 class NGO(db.Model):
     __tablename__ = 'ngos'

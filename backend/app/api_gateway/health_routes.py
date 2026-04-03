@@ -41,7 +41,7 @@ def health_check():
 def status():
     """Get detailed system status information."""
     try:
-        db.session.execute('SELECT 1')
+        db.session.execute(text('SELECT 1'))
         
         return jsonify({
             "status": "running",
