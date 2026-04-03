@@ -34,8 +34,8 @@ def add_food(current_user):
     # }
     # freshness_score = ais.calculate_freshness_score(preparation_time)
 
-    if current_user.role != 'donor':
-        return jsonify({"message": "Unauthorized: Only donors can add food items"}), 403
+    if current_user != 'DONOR':
+        return jsonify({"message": "Unauthorized: Only donors can add food items", "currentUser": current_user}), 403
     
     data = request.get_json()
     donor_data = {"title" : data.get('title'),

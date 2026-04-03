@@ -35,14 +35,22 @@ def token_required(f):
         try:
             # Explicitly state the algorithm to prevent 'algorithm confusion' attacks
             data = jwt.decode(token, str(app.config.get("SECRET_KEY")), algorithms=["HS256"])
-            from app.db_models import User
-            current_user = User.query.filter_by(uid=data['sub']).first()
+            print(f"Decoded JWT data: {data}")
+            try:
+                from app.db_models import User
+                current_user = User.query.filter_by(uid=data['sub']).first()
+                print(f"Current user from token: {current_user}, Role: {data.get('role', None)}")
+                return f(current_user, *args, **kwargs)
+            except Exception as e:
+                print(f"Database error fetching user: {e}")
+
         except jwt.ExpiredSignatureError:
             return jsonify({'message': 'Token has expired!'}), 401
-        except jwt.InvalidTokenError:
+        # except jwt.InvalidTokenError:
+        except Exception as e:
+            print(f"Token decoding error: {e}")
             return jsonify({'message': 'Invalid token!'}), 401
-            
-        return f(current_user, *args, **kwargs)
+        return "None"
     return decorated
 
 print("Setting up authentication routes...")
