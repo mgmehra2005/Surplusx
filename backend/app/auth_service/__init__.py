@@ -1,5 +1,7 @@
 from .verification import verifyUser, verifyEmail, verifyPasswordByUsername, verifyPasswordByEmail
 
+
+
 def loginWithUsername(user: str, password: str) -> bool:
     if verifyUser(user) and verifyPasswordByUsername(user, password):
         return True

@@ -1,18 +1,26 @@
 from app import app
 from flask import request, jsonify
 from app.auth_service import loginWithEmail, loginWithUsername
+from app.auth_service.registration import registerUser
 
 print("Setting up authentication routes...")
-# @app.route('/api/auth/register', methods=['POST'])
-# def register():
-#     data = {
+@app.route('/api/auth/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data.get('username')
+    fname = data.get('firstName')
+    lname = data.get('lastName')
+    full_name = f"{fname} {lname}".strip()
+    email = data.get('email')
+    phone = data.get('phone')
+    role = data.get('role')
+    password = data.get('password')
 
-#         "username": request.form.get('username'),
-#         "email": request.form.get('email'),
-#         "password": request.form.get('password')
-#     }
-    
-#     return jsonify({"message": "User registered successfully", "data": data}), 201
+    _registereduserResponse = registerUser(username, email, password, role, phone, full_name)
+    if _registereduserResponse:
+        return jsonify({"message": "User registered successfully", "data": data}), 201
+    else:
+        return jsonify({"message": "User Not registered", "data": data})
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
