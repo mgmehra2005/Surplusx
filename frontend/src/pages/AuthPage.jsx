@@ -37,12 +37,10 @@ function AuthPage() {
   const location = useLocation()
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    const modeParam = params.get('mode')
-    if (modeParam === 'login' || modeParam === 'register') {
-      setMode(modeParam)
+    if (location.state?.mode) {
+      setMode(location.state.mode)
     }
-  }, [location.search])
+  }, [location.state])
 
   const onInputChange = (event) => {
     const { name, value } = event.target

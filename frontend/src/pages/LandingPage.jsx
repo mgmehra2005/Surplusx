@@ -42,23 +42,36 @@ function LandingPage() {
   const [activeRole, setActiveRole] = useState('donors') // 'donors' or 'ngos'
   const { hash } = useLocation()
 
-  useEffect(() => {
-    if (hash) {
-      const target = hash.startsWith('#') ? hash : `#${hash}`
-      const isHome = target === '#home' || target === '#'
+  const location = useLocation()
 
+  useEffect(() => {
+    const scrollToId = (id) => {
+      const isHome = id === 'home' || id === 'top'
       gsap.to(window, {
         duration: 1.2,
         scrollTo: { 
-          y: target, 
+          y: isHome ? 0 : `#${id}`, 
           autoKill: false, 
           offsetY: isHome ? 0 : 100 
         },
         ease: 'power4.inOut',
-        overwrite: 'all', // Prevent multiple scroll tweens from fighting
+        overwrite: 'all',
       })
     }
-  }, [hash])
+
+    // 1. Handle navigation from of state (cross-page)
+    if (location.state?.scrollTo) {
+      scrollToId(location.state.scrollTo)
+      // Clear state to avoid scrolling again on back nav
+      window.history.replaceState({}, document.title)
+    }
+
+    // 2. Handle same-page internal clicking
+    const handleEvent = (e) => scrollToId(e.detail)
+    window.addEventListener('scrollToSection', handleEvent)
+
+    return () => window.removeEventListener('scrollToSection', handleEvent)
+  }, [location])
 
   const content = {
     donors: {

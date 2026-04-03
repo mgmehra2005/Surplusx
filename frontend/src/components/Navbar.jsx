@@ -1,15 +1,24 @@
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
 import logo from '../assets/transparent_logo.png'
 
 function Navbar() {
   const { isAuthenticated, user } = useAuth()
+  const navigate = useNavigate()
 
   const navLinks = [
-    { name: 'Home', path: '/#home' },
-    { name: 'How It Works', path: '/#how-it-works' },
-    { name: 'Impact', path: '/#impact' },
+    { name: 'Home', target: 'home' },
+    { name: 'How It Works', target: 'how-it-works' },
+    { name: 'Impact', target: 'impact' },
   ]
+
+  const handleNav = (target) => {
+    if (window.location.pathname !== '/') {
+      navigate('/', { state: { scrollTo: target } })
+    } else {
+      window.dispatchEvent(new CustomEvent('scrollToSection', { detail: target }))
+    }
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/20 px-6 py-5 backdrop-blur-md md:px-16 lg:px-24">
@@ -29,13 +38,13 @@ function Navbar() {
         {/* Center: Links */}
         <div className="hidden flex-initial items-center space-x-10 md:flex">
           {navLinks.map((link) => (
-            <NavLink
+            <button
               key={link.name}
-              to={link.path}
+              onClick={() => handleNav(link.target)}
               className="font-instrument text-[19px] font-medium text-slate-600 transition-colors hover:text-emerald-600"
             >
               {link.name}
-            </NavLink>
+            </button>
           ))}
         </div>
 
@@ -44,13 +53,15 @@ function Navbar() {
           {!isAuthenticated ? (
             <>
               <Link
-                to="/auth?mode=login"
+                to="/auth"
+                state={{ mode: 'login' }}
                 className="font-instrument rounded-full bg-emerald-600 px-8 py-2 text-[17px] font-medium text-white transition-all hover:bg-emerald-700"
               >
                 Login
               </Link>
               <Link
-                to="/auth?mode=register"
+                to="/auth"
+                state={{ mode: 'register' }}
                 className="font-instrument text-[17px] font-medium text-slate-600 transition-colors hover:text-emerald-600"
               >
                 Sign Up
