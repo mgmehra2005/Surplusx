@@ -1,4 +1,5 @@
 import { createContext, useState } from 'react'
+import { loginUser, registerUser } from '../services/api.js'
 
 const AuthContext = createContext(null)
 
@@ -16,29 +17,50 @@ export function AuthProvider({ children }) {
     }
   })
 
-  const saveUser = (authUser) => {
-    localStorage.setItem('surplusx-auth', JSON.stringify(authUser))
-    setUser(authUser)
+  const [token, setToken] = useState(() => localStorage.getItem('surplusx-token'))
+
+  const saveAuth = (userData, authToken) => {
+    localStorage.setItem('surplusx-auth', JSON.stringify(userData))
+    localStorage.setItem('surplusx-token', authToken)
+    setUser(userData)
+    setToken(authToken)
   }
 
-  // BUG FIX #1: Now uses token-based auth from backend instead of email pattern
-  // BUG FIX #2: Uses actual role from backend instead of parsing email
-  const login = ({ username, email, token, uid, role }) => {
-    saveUser({ username, email, token, uid, role })
+  const login = async ({ username, password }) => {
+    try {
+      const data = await loginUser({ username, password })
+      // Assuming API returns { user: {...}, token: "..." }
+      saveAuth(data.user, data.token)
+      return data
+    } catch (error) {
+      console.error('Login Error:', error)
+      throw error
+    }
   }
 
-  const register = ({ username, email, token, uid, role }) => {
-    saveUser({ username, email, token, uid, role })
+  const register = async (userData) => {
+    try {
+      const data = await registerUser(userData)
+      // Assuming API returns { user: {...}, token: "..." }
+      saveAuth(data.user, data.token)
+      return data
+    } catch (error) {
+      console.error('Registration Error:', error)
+      throw error
+    }
   }
 
   const logout = () => {
     localStorage.removeItem('surplusx-auth')
+    localStorage.removeItem('surplusx-token')
     setUser(null)
+    setToken(null)
   }
 
   const value = {
     user,
-    isAuthenticated: Boolean(user && user.token),
+    token,
+    isAuthenticated: Boolean(user && token),
     login,
     register,
     logout,

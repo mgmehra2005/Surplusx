@@ -6,20 +6,32 @@ export const apiClient = axios.create({
   baseURL: API_BASE_URL,
 })
 
-// Add JWT token to all requests
 apiClient.interceptors.request.use((config) => {
-  const auth = localStorage.getItem('surplusx-auth')
-  if (auth) {
-    try {
-      const authData = JSON.parse(auth)
-      if (authData.token) {
-        config.headers.Authorization = `Bearer ${authData.token}`
-      }
-    } catch (e) {
-      console.error('Failed to parse auth data:', e)
-    }
+  const token = localStorage.getItem('surplusx-token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
   }
   return config
+})
+
+export async function loginUser({ username, password }) {
+  const { data } = await apiClient.post('/auth/login', { username, password })
+  return data
+}
+
+export async function registerUser(userData) {
+  const { data } = await apiClient.post('/auth/register', userData)
+  return data
+}
+
+/*
+  TODO: Connect to Flask API: http://localhost:5000/api/....
+  This service intentionally returns mock data right now.
+  Replace these mocked async functions with real axios calls when backend APIs are finalized.
+*/
+
+const delay = (ms = 250) => new Promise((resolve) => {
+  setTimeout(resolve, ms)
 })
 
 // BUG FIX: All functions now call real backend API instead of mock data
