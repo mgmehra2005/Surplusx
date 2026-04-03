@@ -12,7 +12,7 @@ def register():
     fname = data.get('firstName')
     lname = data.get('lastName')
     full_name = f"{fname} {lname}".strip()
-    email = data.get('email')
+    email = data.get('email').lower()
     phone = data.get('phone')
     role = data.get('role')
     password = data.get('password')
