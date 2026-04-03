@@ -14,7 +14,11 @@ Jinja2==3.1.6
 MarkupSafe==3.0.3
 numpy==2.4.4
 pycparser==3.0
+<<<<<<< HEAD
 PyJWT==2.8.0
+=======
+PyJWT==2.12.1
+>>>>>>> 2797268891531906f7058a455df7086a452e40b6
 PyMySQL==1.1.2
 python-dotenv==1.2.2
 SQLAlchemy==2.0.48
