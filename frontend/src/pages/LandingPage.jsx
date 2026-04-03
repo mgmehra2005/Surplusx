@@ -114,7 +114,7 @@ function LandingPage() {
       </main>
 
       {/* How it Works Section */}
-      <section id="how-it-works" className="px-6 py-16 md:px-16 lg:px-24">
+      <section id="how-it-works" className="mt-12 px-6 py-16 md:px-16 lg:px-24">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 flex flex-col items-center text-center">
             <h2 className="font-instrument text-3xl tracking-tight text-slate-900 md:text-4xl">
