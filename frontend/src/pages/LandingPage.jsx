@@ -45,10 +45,17 @@ function LandingPage() {
   useEffect(() => {
     if (hash) {
       const target = hash.startsWith('#') ? hash : `#${hash}`
+      const isHome = target === '#home' || target === '#'
+
       gsap.to(window, {
         duration: 1.2,
-        scrollTo: { y: target, autoKill: false, offsetY: 100 },
-        ease: 'power3.inOut',
+        scrollTo: { 
+          y: target, 
+          autoKill: false, 
+          offsetY: isHome ? 0 : 100 
+        },
+        ease: 'power4.inOut',
+        overwrite: 'all', // Prevent multiple scroll tweens from fighting
       })
     }
   }, [hash])
