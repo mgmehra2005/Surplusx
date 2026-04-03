@@ -30,15 +30,20 @@ export function AuthProvider({ children }) {
     }
   })
 
-  const saveUser = (authUser) => {
-    localStorage.setItem('surplusx-auth', JSON.stringify(authUser))
-    setUser(authUser)
+  const [token, setToken] = useState(() => localStorage.getItem('surplusx-token'))
+
+  const saveAuth = (userData, authToken) => {
+    localStorage.setItem('surplusx-auth', JSON.stringify(userData))
+    localStorage.setItem('surplusx-token', authToken)
+    setUser(userData)
+    setToken(authToken)
   }
 
   const login = async ({ username, password }) => {
     try {
       const data = await loginUser({ username, password })
-      saveUser(data)
+      // Assuming API returns { user: {...}, token: "..." }
+      saveAuth(data.user, data.token)
       return data
     } catch (error) {
       console.error('Login Error:', error)
@@ -49,7 +54,8 @@ export function AuthProvider({ children }) {
   const register = async (userData) => {
     try {
       const data = await registerUser(userData)
-      saveUser(data)
+      // Assuming API returns { user: {...}, token: "..." }
+      saveAuth(data.user, data.token)
       return data
     } catch (error) {
       console.error('Registration Error:', error)
@@ -59,12 +65,15 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('surplusx-auth')
+    localStorage.removeItem('surplusx-token')
     setUser(null)
+    setToken(null)
   }
 
   const value = {
     user,
-    isAuthenticated: Boolean(user),
+    token,
+    isAuthenticated: Boolean(user && token),
     login,
     register,
     logout,
