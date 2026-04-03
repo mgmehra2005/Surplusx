@@ -4,6 +4,11 @@ export const apiClient = axios.create({
   baseURL: 'http://localhost:5000/api',
 })
 
+export async function loginUser({ username, password }) {
+  const { data } = await apiClient.post('/auth/login', { username, password })
+  return data
+}
+
 /*
   TODO: Connect to Flask API: http://localhost:5000/api/....
   This service intentionally returns mock data right now.

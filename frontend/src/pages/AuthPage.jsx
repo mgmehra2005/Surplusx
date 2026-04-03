@@ -20,6 +20,7 @@ function getRouteByRole(role) {
 
 function AuthPage() {
   const [mode, setMode] = useState('login')
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -92,38 +93,48 @@ function AuthPage() {
     return Object.keys(nextErrors).length === 0
   }
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault()
 
     if (!validate()) {
       return
     }
 
-    const authPayload = {
-      username: formData.username.trim(),
-      email: formData.email.trim(),
-      password: formData.password,
-      firstName: formData.firstName.trim(),
-      lastName: formData.lastName.trim(),
-      phone: `${formData.countryCode} ${formData.phone.trim()}`,
-      role: formData.role,
+    setLoading(true)
+    setErrors({})
+
+    try {
+      if (mode === 'login') {
+        const userData = await login({
+          username: formData.username.trim(),
+          password: formData.password,
+        })
+
+        // On success, navigate to the specific dashboard
+        const role = userData?.role || 'donor'
+        navigate(getRouteByRole(role))
+      } else {
+        const authPayload = {
+          username: formData.username.trim(),
+          email: formData.email.trim(),
+          password: formData.password,
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          phone: `${formData.countryCode} ${formData.phone.trim()}`,
+          role: formData.role,
+        }
+
+        register(authPayload)
+
+        const finalRole = authPayload.role
+        navigate(getRouteByRole(finalRole))
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || 'Authentication failed. Please check your credentials.'
+      setErrors({ form: message })
+    } finally {
+      setLoading(false)
     }
-
-    if (mode === 'login') {
-      login(authPayload)
-    } else {
-      register(authPayload)
-    }
-
-    const finalRole = mode === 'login'
-      ? (authPayload.email.toLowerCase().includes('admin')
-        ? 'admin'
-        : authPayload.email.toLowerCase().includes('ngo')
-          ? 'ngo'
-          : 'donor')
-      : authPayload.role
-
-    navigate(getRouteByRole(finalRole))
   }
 
   return (
@@ -158,6 +169,11 @@ function AuthPage() {
         </div>
 
         <form className="mt-8 space-y-5" onSubmit={onSubmit}>
+          {errors.form && (
+            <div className="rounded-xl border border-red-100 bg-red-50 p-4 font-instrument text-sm text-red-600">
+              {errors.form}
+            </div>
+          )}
           {mode === 'register' && (
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -336,10 +352,18 @@ function AuthPage() {
           </div>
 
           <button
-            className="font-instrument w-full rounded-full bg-emerald-600 py-3 text-[15px] font-medium text-white transition-all hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/20 active:scale-[0.98]"
+            className="font-instrument flex w-full items-center justify-center rounded-full bg-emerald-600 py-3 text-[15px] font-medium text-white transition-all hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             type="submit"
+            disabled={loading}
           >
-            {mode === 'login' ? 'Login to Dashboard' : 'Create Account'}
+            {loading ? (
+              <svg className="h-5 w-5 animate-spin text-white" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              mode === 'login' ? 'Login to Dashboard' : 'Create Account'
+            )}
           </button>
         </form>
       </section>
